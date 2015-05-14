@@ -1,46 +1,84 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext as _
 
 
 class Driver(models.Model):
-    id = models.AutoField(primary_key=True, unique=True)
-    tel = models.CharField(max_length=255)
     user = models.ForeignKey(User)
+
+    class Meta:
+        verbose_name = _('Driver')
+        verbose_name_plural = _('Drivers')
+
+    def __unicode__(self):
+        return self.user.username
 
 
 class Routing(models.Model):
-    driver_id = models.ForeignKey('Driver', to_field='id')
+    driver = models.ForeignKey(Driver)
     date = models.DateField()
-    id = models.AutoField(primary_key=True, unique=True)
+
+    class Meta:
+        verbose_name = _('Routing')
+        verbose_name_plural = _('Routings')
+
+    def __unicode__(self):
+        return self.driver.user.username
 
 
 class TemporalMatching(models.Model):
-    offer_id = models.ForeignKey('Offer', to_field='id')
-    beneficiary_id = models.ForeignKey('Beneficiary', to_field='id')
+    offer = models.ForeignKey('donor.Offer')
+    beneficiary = models.ForeignKey('beneficiary.Beneficiary')
     date = models.DateField()
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
     status = models.PositiveSmallIntegerField()
+
+    class Meta:
+        verbose_name = _('Temporal match')
+        verbose_name_plural = _('Temporal matchings')
+
+    def __unicode__(self):
+        return '%s - %s @%s' (self.offer, self.beneficiary, str(self.date))
 
 
 class VisitPoint(models.Model):
-    id = models.AutoField(primary_key=True, unique=True)
     seq_num = models.PositiveSmallIntegerField()
-    matched_id = models.ForeignKey('Matched', to_field='id')
+    matched = models.ForeignKey('Matched', to_field='id')
     status = models.PositiveSmallIntegerField()
-    donnor = models.BooleanField()
+    donor = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _('Visit point')
+        verbose_name_plural = _('Visit points')
+
+    def __unicode__(self):
+        return '%s' (self.seq_num)
 
 
 class Delivery(models.Model):
-    routing_id = models.ForeignKey('Routing', to_field='id')
-    visit_point = models.ForeignKey('VisitPoint', to_field='id')
+    routing = models.ForeignKey(Routing)
+    visit_point = models.ForeignKey(VisitPoint)
+
+    class Meta:
+        verbose_name = _('Delivery')
+        verbose_name_plural = _('Delivery points')
+
+    def __unicode__(self):
+        return 'deliver for %s' (self.routing)
 
 
 class Matched(models.Model):
-    offer_id = models.ForeignKey('Offer', to_field='id')
-    beneficiary_id = models.ForeignKey('Beneficiary', to_field='id')
-    driver_id = models.ForeignKey('Driver', to_field='id')
+    offer = models.ForeignKey('donor.Offer')
+    beneficiary = models.ForeignKey('beneficiary.Beneficiary')
+    driver = models.ForeignKey(Driver)
     date = models.DateField()
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
-    id = models.AutoField(primary_key=True, unique=True)
+
+    class Meta:
+        verbose_name = _('Match')
+        verbose_name_plural = _('Matches')
+
+    def __unicode__(self):
+        return '%s - %s @%s' (self.offer, self.beneficiary, str(self.date))
