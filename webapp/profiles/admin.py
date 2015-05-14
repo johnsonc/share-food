@@ -13,6 +13,7 @@ class ProfileInline(admin.StackedInline):
 class UserWithProfileAdmin(UserAdmin):
     inlines = (ProfileInline, )
 
+
 admin.site.unregister(User)
 admin.site.register(User, UserWithProfileAdmin)
 

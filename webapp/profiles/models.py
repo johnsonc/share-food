@@ -1,9 +1,13 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class Organization(models.Model):
+    DEFAULT_ORGANIZATION_NAME = 'Individual'
+
     MASS_UNITS = (
         ('kg', 'kg'),
         ('lb', 'lb')
@@ -16,7 +20,6 @@ class Organization(models.Model):
     tel_2 = models.CharField(max_length=255, blank=True, null=True)
     email = models.EmailField()
     default_mass_unit = models.CharField(max_length=5, choices=MASS_UNITS, default='kg') #Changed from positive integer
-    donor = models.BooleanField(default=False)
     location = models.PointField(blank=True, null=True)
 
     objects = models.GeoManager()
@@ -30,6 +33,7 @@ class Organization(models.Model):
 
 
 class Profile(models.Model):
+    """
     TYPE = (
         ('D', 'Donor'),
         ('B', 'Beneficiary'),
@@ -37,6 +41,7 @@ class Profile(models.Model):
         ('O', 'Other'),
     )
     user_type = models.CharField(max_length=1, choices=TYPE)
+    """
     organization = models.ForeignKey(Organization, null=True, blank=True)
     user = models.OneToOneField(User, related_name="profile")
 

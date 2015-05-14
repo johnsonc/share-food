@@ -1,10 +1,16 @@
 from django.db import models
 from django.utils.translation import ugettext as _
+from profiles.models import Organization
 
 
-class Beneficiary(models.Model):
-    beneficiary = models.OneToOneField('profiles.Organization', primary_key=True)
-    group = models.CharField(max_length=255)# TODO nie wiem o co chodzi z tym polem
+class BeneficiaryGroup(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __unicode__(self):
+        return self.name
+
+class Beneficiary(Organization):
+    group = models.ForeignKey(BeneficiaryGroup, related_name='beneficiaries', blank=True, null=True)
     num_meals = models.PositiveIntegerField()
     frozen_capacity = models.PositiveIntegerField()
     refrigerated_capacity = models.PositiveIntegerField()

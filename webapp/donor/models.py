@@ -1,14 +1,11 @@
 from django.db import models
 from django.utils.translation import ugettext as _
+from profiles.models import Organization
+from beneficiary.models import BeneficiaryGroup
 
-"""
-TODO remove this class, ask Jacek
-"""
-"""
-class Donnor(models.Model):
-    id = models.ForeignKey('Organization', to_field='id')
-    default_beneficiary_group = models.PositiveIntegerField()
-"""
+
+class Donnor(Organization):
+    default_beneficiary_group = models.ForeignKey(BeneficiaryGroup, blank=True, null=True)
 
 
 class Offer(models.Model):
@@ -51,7 +48,7 @@ class OfferRepetition(models.Model):
 
     )
     offer = models.ForeignKey(Offer)
-    day_freq = models.PositiveSmallIntegerField()
+    day_freq = models.PositiveSmallIntegerField(verbose_name=_('Day frequency'))
     date_start = models.DateField()
     date_stop = models.DateField()
     day_of_week = models.CharField(max_length=3, choices=DAYS_OF_THE_WEEK)
