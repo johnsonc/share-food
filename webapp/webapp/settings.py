@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'donor',
     'beneficiary',
     'matcher',
+    'dictionaries',
     'webapp',
 )
 

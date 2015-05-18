@@ -2,6 +2,7 @@ from django.contrib.gis import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from django.conf import settings
 from .models import Profile, Organization, Dictionary
 
 
