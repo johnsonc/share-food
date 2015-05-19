@@ -32,4 +32,20 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         DeliveriesInline
         ]
 
+    def get_form(self, request, obj=None, **kwargs):
+        self.exclude = []
+        if not request.user.is_superuser:
+            self.exclude.append('user')
+        return super(BeneficiaryAdmin, self).get_form(request, obj, **kwargs)
+
+    def save_model(self, request, obj, form, change):
+        if not request.user.is_superuser:
+            obj.user = request.user
+        obj.save()
+
+    def get_queryset(self, request):
+        qs = super(BeneficiaryAdmin, self).get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(user=request.user)
 admin.site.register(BeneficiaryGroup)

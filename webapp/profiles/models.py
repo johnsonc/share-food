@@ -22,6 +22,8 @@ class Organization(models.Model):
     default_mass_unit = models.CharField(max_length=5, choices=MASS_UNITS, default='kg') #Changed from positive integer
     location = models.PointField(blank=True, null=True)
 
+    user = models.OneToOneField(User, related_name="organization")
+
     objects = models.GeoManager()
 
     class Meta:
@@ -33,17 +35,22 @@ class Organization(models.Model):
 
 
 class Profile(models.Model):
-    """
-    TYPE = (
-        ('D', 'Donor'),
-        ('B', 'Beneficiary'),
-        ('C', 'Driver'),
-        ('O', 'Other'),
+    DEFAULT_ORGANIZATION_NAME = 'Individual'
+
+    MASS_UNITS = (
+        ('kg', 'kg'),
+        ('lb', 'lb')
     )
-    user_type = models.CharField(max_length=1, choices=TYPE)
-    """
-    organization = models.ForeignKey(Organization, null=True, blank=True)
+
     user = models.OneToOneField(User, related_name="profile")
+
+    address = models.CharField(max_length=255)
+    tel_1 = models.CharField(max_length=255)
+    tel_2 = models.CharField(max_length=255, blank=True, null=True)
+    default_mass_unit = models.CharField(max_length=5, choices=MASS_UNITS, default='kg') #Changed from positive integer
+    location = models.PointField(blank=True, null=True)
+
+    objects = models.GeoManager()
 
     class Meta:
         verbose_name = _('Profile')
@@ -52,7 +59,7 @@ class Profile(models.Model):
     def __unicode__(self):
         return '%s profile' % self.user.username
 
-
+"""
 class Dictionary(models.Model):
     upper_dic_id = models.PositiveIntegerField()
     item_id = models.PositiveIntegerField()
@@ -64,3 +71,4 @@ class Dictionary(models.Model):
 
     def __unicode__(self):
         return self.item_name
+"""

@@ -3,16 +3,19 @@ from django.utils.translation import ugettext as _
 from datetime import datetime, timedelta
 from django.utils import timezone
 from profiles.models import Organization
+from django.contrib.auth.models import User
 from beneficiary.models import BeneficiaryGroup
 from dictionaries.models import FoodCategory, MeatIssues, ReligiousIssues, PackagingCategory, TemperatureCategory, FoodIngredients, DaysOfTheWeek
 import pytz
 
-class Donnor(Organization):
+
+class Donor(models.Model):
     default_beneficiary_group = models.ManyToManyField(BeneficiaryGroup, verbose_name=_('Beneficiary group'))
+    user = models.OneToOneField(User, related_name='donor_profile')
 
 
 class Offer(models.Model):
-    donor = models.ForeignKey('profiles.Organization', to_field='id')
+    donor = models.ForeignKey(User)
     name = models.CharField(_('Delivery name'), max_length=255)
 
     food_category = models.ForeignKey(FoodCategory, verbose_name=_('Food category'))

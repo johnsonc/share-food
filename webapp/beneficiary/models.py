@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import ugettext as _
+from django.contrib.auth.models import User
 from profiles.models import Organization
 
 
@@ -9,7 +10,8 @@ class BeneficiaryGroup(models.Model):
     def __unicode__(self):
         return self.name
 
-class Beneficiary(Organization):
+
+class Beneficiary(models.Model):
     group = models.ForeignKey(BeneficiaryGroup, related_name='beneficiaries', blank=True, null=True)
     num_meals = models.PositiveIntegerField()
     frozen_capacity = models.PositiveIntegerField()
@@ -21,6 +23,8 @@ class Beneficiary(Organization):
     accept_rel_issue = models.PositiveSmallIntegerField()
     preference_info = models.TextField()
     last_delivery = models.DateField()
+
+    user = models.OneToOneField(User, related_name='beneficiary_profile')
 
     class Meta:
         verbose_name = _('Beneficiary')

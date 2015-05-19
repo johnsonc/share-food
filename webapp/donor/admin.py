@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.translation import ugettext as _
 
-from .models import OfferRepetition, Offer, Donnor
+from .models import OfferRepetition, Offer#, Donnor
 
 
 class RepetitionInline(admin.StackedInline):
@@ -12,7 +12,6 @@ class RepetitionInline(admin.StackedInline):
 
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    #list_display = ('name', 'beneficiary_group', 'food_category', 'estimated_mass', 'date', 'active')
     fieldsets = (
         (None, {
             'fields': ('name', ('food_category', 'estimated_mass',), 'contact_person')
@@ -57,7 +56,7 @@ class OfferAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(donor=request.user)
-
+"""
 @admin.register(Donnor)
 class DonorAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -74,3 +73,4 @@ class DonorAdmin(admin.ModelAdmin):
             'fields': ('default_mass_unit', 'default_beneficiary_group', 'location',)
         })
         )
+"""
