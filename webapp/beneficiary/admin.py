@@ -11,6 +11,7 @@ class DeliveriesInline(admin.StackedInline):
 
 @admin.register(Beneficiary)
 class BeneficiaryAdmin(admin.ModelAdmin):
+    """
     fieldsets = (
         (None, {
             'fields': ('num_meals', 'frozen_capacity', 'refrigerated_capacity', 'drystorage_capacity',
@@ -28,6 +29,7 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         })
 
     )
+    """
     inlines = [
         DeliveriesInline
         ]
@@ -48,4 +50,5 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(user=request.user)
+
 admin.site.register(BeneficiaryGroup)

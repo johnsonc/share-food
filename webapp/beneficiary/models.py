@@ -12,7 +12,7 @@ class BeneficiaryGroup(models.Model):
 
 
 class Beneficiary(models.Model):
-    group = models.ForeignKey(BeneficiaryGroup, related_name='beneficiaries', blank=True, null=True)
+    group = models.ForeignKey(BeneficiaryGroup, blank=True, null=True)
     num_meals = models.PositiveIntegerField()
     frozen_capacity = models.PositiveIntegerField()
     refrigerated_capacity = models.PositiveIntegerField()
@@ -24,14 +24,14 @@ class Beneficiary(models.Model):
     preference_info = models.TextField()
     last_delivery = models.DateField()
 
-    user = models.OneToOneField(User, related_name='beneficiary_profile')
+    user = models.OneToOneField(User)
 
     class Meta:
         verbose_name = _('Beneficiary')
         verbose_name_plural = _('Beneficiaries')
 
     def __unicode__(self):
-        return self.beneficiary.name
+        return self.user.username
 
 
 class DeliveryTimeWindows(models.Model):
