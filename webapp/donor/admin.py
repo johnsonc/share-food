@@ -7,11 +7,33 @@ from .models import OfferRepetition, Offer, Donnor
 class RepetitionInline(admin.StackedInline):
     model = OfferRepetition
     verbose_name_plural = _('Repetitions')
+    max_num = 1
 
 
 @admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    list_display = ('name', 'beneficiary_group', 'food_category', 'estimated_mass', 'date', 'active')
+    #list_display = ('name', 'beneficiary_group', 'food_category', 'estimated_mass', 'date', 'active')
+    fieldsets = (
+        (None, {
+            'fields': ('name', ('food_category', 'estimated_mass',), 'contact_person')
+        }),
+        ('Beneficiary groups', {
+            'fields': ('beneficiary_group',),
+        }),
+        ('Food type', {
+            'fields': (('meat_issue', 'rel_issue',),
+                       ('temperature', 'packaging', ),)
+        }),
+        ('Food ingredients', {
+            'fields': ('not_contain',)
+        }),
+        ('Driver info', {
+            'fields': (('address', 'driver_info',),)
+        }),
+        ('Time info', {
+            'fields': (('time_from', 'time_to',),)
+        }),
+        )
     inlines = [
         RepetitionInline
         ]
@@ -38,16 +60,17 @@ class OfferAdmin(admin.ModelAdmin):
 
 @admin.register(Donnor)
 class DonorAdmin(admin.ModelAdmin):
-    fields = (
-        'name',
-        'address',
-        'first_name',
-        'last_name',
-        'tel_1',
-        'tel_2',
-        'email',
-        'default_mass_unit',
-        'default_beneficiary_group',
-        'location',
-
-    )
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'address',)
+        }),
+        ('Contact person', {
+            'fields': ('first_name', 'last_name', 'email',),
+        }),
+        ('Telephone numbers', {
+            'fields': ('tel_1', 'tel_2',)
+        }),
+        ('Others', {
+            'fields': ('default_mass_unit', 'default_beneficiary_group', 'location',)
+        })
+        )
