@@ -6,30 +6,23 @@ from .models import Beneficiary, DeliveryTimeWindows, BeneficiaryGroup
 
 class DeliveriesInline(admin.StackedInline):
     model = DeliveryTimeWindows
+    max_num = 1
     verbose_name_plural = _('Deliveries')
 
 
 @admin.register(Beneficiary)
 class BeneficiaryAdmin(admin.ModelAdmin):
-    """
     fieldsets = (
-        (None, {
-            'fields': ('num_meals', 'frozen_capacity', 'refrigerated_capacity', 'drystorage_capacity',
-                        'food_category', 'dont_accept', 'accept_meat_issue', 'accept_rel_issue',
-                        'preference_info')
-        }),
-        ('Organization options', {
+        (_('Basic info'), {
             'classes': ('collapse',),
-            'fields': ('name', 'address', 'first_name', 'last_name', 'tel_1', 'tel_2',
-                       'email', 'default_mass_unit', 'location')
+            'fields': ('num_meals', 'food_category', 'dont_accept', 'accept_meat_issue', 'accept_rel_issue', 'preference_info')
         }),
-        ('Advanced options', {
-            'classes': ('collapse',),
-            'fields': ('group', 'last_delivery')
-        })
+        (_('Storage capacity'), {
+#            'classes': ('collapse',),
+            'fields': ('frozen_capacity', 'refrigerated_capacity', 'drystorage_capacity',)
+        }),
 
     )
-    """
     inlines = [
         DeliveriesInline
         ]

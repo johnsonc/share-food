@@ -21,6 +21,7 @@ class DonorProfileInline(admin.StackedInline):
 
 class BeneficiaryProfileInline(admin.StackedInline):
     model = Beneficiary
+    exclude = ('last_delivery',)
     verbose_name = _('Beneficiary profile')
 
 
