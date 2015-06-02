@@ -1,0 +1,252 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">
+{% trans "Home" %}</a> > Matcher</div>{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
+<link rel="stylesheet" href="/static/app/styles/matching.css">
+{% endblock %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.js"></script>
+<script type="text/javascript" src="/static/admin/js/related-widget-wrapper.js"></script>
+<script type="text/javascript" src="/static/admin/js/calendar.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+{% endblock %}
+{% block bodyclass %}" ng-app="angApp{% endblock %}
+{% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        <h1>Matcher</h1>
+        
+        <div id="content-main" ng-controller="matching">
+            <fieldset class="module aligned">
+                <div class="form-row field-date">
+                    <div>
+                        <label class="required" for="id_date">Date:</label>
+                        <input class="vDateField" id="id_date" name="date" size="10" type="text" ng-model="income_date"  ng-change="getList(income_date)"><span class="datetimeshortcuts">&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, 0);">Today</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.openCalendar(0);" id="calendarlink0"><img src="/static/admin/img/icon_calendar.gif" alt="Calendar"></a></span>
+                    </div>
+                </div>
+                <div class="form-row field-date">
+                    <div>
+                        <label class="required" for="id_date">Mass unit:</label>
+                        <div class="mass_unit" ng-model="form">
+                            <label class="radio">
+                              <input type="radio" name="iROptions" id="inlineRadio1" value="kg" ng-model="form.mass_unit" > kg
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="iROptions" id="inlineRadio2" value="pounds" ng-model="form.mass_unit"> pounds
+                            </label>
+                            [[form]]
+                        </div>
+                    </div>
+                </div>
+            
+            
+                <div class="form-row field-meat_issue field-rel_issue">
+                    <div class="field-box field-meat_issue">
+                        <label class="required" for="">Donors:</label>
+                        <div class="related-widget-wrapper">
+                            <table class="table table-hover">
+                              <thead>
+                                  <tr>
+                                      <th>ID</th>
+                                      <th>Donnor</th>
+                                      <th>Accepted[%]</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr>
+                                      <th>1</th>
+                                      <th>bbbbbb</th>
+                                      <th>cccccc</th>
+                                  </tr>
+                                  <tr>
+                                      <th>2</th>
+                                      <th>bbbbbb</th>
+                                      <th>cccccc</th>
+                                  </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="field-box field-rel_issue">
+                        <label class="required inline" for="">Beneficiary:</label>
+                        <div class="related-widget-wrapper">
+                            <div class="box" ng-model="select">
+                                <label class="radio-inline">
+                                Select:
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.active" value="pending"> pending
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio2" ng-model="select.active" value="waiting"> waiting
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio3" ng-model="select.active" value="confirmed"> confirmed
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio4" ng-model="select.active" value="accepted"> accepted
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio5" ng-model="select.active" value="assigned"> assigned
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio6" ng-model="select.active" value="notified"> notified
+                                </label>
+                            </div>
+                            ---[[select.active]]---
+                            <div class="box">
+                                <table class="table table-hover">
+                                  <thead>
+                                      <tr>
+                                          <th>#</th>
+                                          <th>ID</th>
+                                          <th>Bebeficiary</th>
+                                          <th>Status</th>
+                                          <th>Num Meals</th>
+                                          <th>Quantity</th>
+                                          <th>Last delivery [days]</th>
+                                          <th>Distance [miles]</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr>
+                                          <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
+                                          <th>1</th>
+                                          <th>aaassa</th>
+                                          <th>bbbfdfd</th>
+                                          <th>cssdd</th>
+                                          <th>dfffdd</th>
+                                          <th>egggfff</th>
+                                          <th>fassddd</th>
+                                      </tr>
+                                      <tr>
+                                          <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
+                                          <th>2</th>
+                                          <th>aaassa</th>
+                                          <th>bbbfdfd</th>
+                                          <th>cssdd</th>
+                                          <th>dfffdd</th>
+                                          <th>egggfff</th>
+                                          <th>fassddd</th>
+                                      </tr>
+                                      <tr>
+                                          <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
+                                          <th>3</th>
+                                          <th>aaassa</th>
+                                          <th>bbbfdfd</th>
+                                          <th>cssdd</th>
+                                          <th>dfffdd</th>
+                                          <th>egggfff</th>
+                                          <th>fassddd</th>
+                                      </tr>
+
+                                  </tbody>
+                                </table>
+                            </div>
+                            <div class="box">
+                                <div>
+                                   <label class="radio-inline">
+                                    Sum: {{sum}}
+                                   </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </fieldset>
+                <fieldset class="module aligned half-box">
+                    <h2>Donor:</h2>
+                    <div class="form-row field-meat_issue field-rel_issue">
+                        <div class="field-box field-meat_issue">
+<!--                            <label class="required" for="">Donor:</label>-->
+                            <div class="info_box">
+                                <h1>{[{name}]}</h1>
+                                <div>Delivery name:</div>
+                                <div>Beneficiary groups:</div>
+                                <div>Food category:</div>
+                                <div>Estimated mass:</div>
+                                <div>Temperature:</div>
+                                <div>Packaging:</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="module aligned  half-box">
+                    <h2>Beneficiary</h2>
+                    <div class="field-box field-meat_issue">
+<!--                            <label class="required" for="">Beneficiary:</label>-->
+                        <div class="info_box">
+                            <h1>{[{name}]}</h1>
+                            <div>Belongs to:</div>
+                            <div>Current storage capacity:</div>
+                            <ul>
+                                <li>frozen:40</li>
+                                <li>refrigerated:45</li>
+                                <li>dry storage:90</li>
+                            </ul>
+                            <div class="info_box">
+                                Aditional info
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="module aligned">
+                    <h2>Actions:</h2>
+                      <button type="button" class="btn btn-default">Send Offer</button>
+                      <button type="button" class="btn btn-default">Accept</button>
+                      <button type="button" class="btn btn-default">Assign driver</button>
+                      <button type="button" class="btn btn-default">Notify</button>
+                      <button type="button" class="btn btn-default">Cancel</button>
+                </fieldset>
+                
+                                
+<script type="text/javascript">
+        (function($) {
+            $(document).ready(function() {
+                $('.add-another').click(function(e) {
+                    e.preventDefault();
+                    showAddAnotherPopup(this);
+                });
+                $('.related-lookup').click(function(e) {
+                    e.preventDefault();
+                    showRelatedObjectLookupPopup(this);
+                });
+            
+                $('form#temporalmatching_form :input:visible:enabled:first').focus()
+            
+            });
+        })(django.jQuery);
+    </script>
+    <script type="text/javascript">
+        (function($) {
+            var field;
+
+
+        })(django.jQuery);
+    </script>
+    <script src="/static/bower_components/angular/angular.js"></script>
+    <script src="/static/bower_components/restangular/dist/restangular.min.js"></script>
+    <script src="/static/app/scripts/app.js"></script>
+<div class="calendarbox module" id="calendarbox0" style="display: none; position: absolute; left: 284px; top: 143px;">
+       <div>
+           <a href="javascript:DateTimeShortcuts.drawPrev(0);" class="calendarnav-previous">&lt;</a>
+           <a href="javascript:DateTimeShortcuts.drawNext(0);" class="calendarnav-next">&gt;</a>
+       </div>
+       <div id="calendarin0" class="calendar">
+           <table><caption>May 2015</caption>
+           <tbody><tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr><tr>
+           <td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> 
+           </td><td class="nonday"> </td><td class="">
+           <a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,1));">1</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,2));">2</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,3));">3</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,4));">4</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,5));">5</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,6));">6</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,7));">7</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,8));">8</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,9));">9</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,10));">10</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,11));">11</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,12));">12</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,13));">13</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,14));">14</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,15));">15</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,16));">16</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,17));">17</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,18));">18</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,19));">19</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,20));">20</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,21));">21</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,22));">22</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,23));">23</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,24));">24</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,25));">25</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,26));">26</a></td><td class="today"><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,27));">27</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,28));">28</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,29));">29</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,30));">30</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,31));">31</a></td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td></tr></tbody></table></div><div class="calendar-shortcuts"><a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, -1);">Yesterday</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, 0);">Today</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, +1);">Tomorrow</a></div><p class="calendar-cancel"><a href="javascript:DateTimeShortcuts.dismissCalendar(0);">Cancel</a></p></div>    
+        
+        
+{% endblock %}

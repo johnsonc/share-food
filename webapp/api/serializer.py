@@ -19,11 +19,11 @@ class BeneficiaryGroupSerializer(serializers.ModelSerializer):
 
         
 class BeneficiarySerializer(serializers.ModelSerializer):
-    bg_name =  BeneficiaryGroupSerializer()
+    group =  BeneficiaryGroupSerializer()
     
     class Meta:
         model = Beneficiary
-        fields = ('id', 'bg_name' ,'num_meals', 'frozen_capacity', 'drystorage_capacity', 'refrigerated_capacity', 'preference_info')
+        fields = ('id', 'group' ,'num_meals', 'frozen_capacity', 'drystorage_capacity', 'refrigerated_capacity', 'preference_info')
         
 
 class TemporalMatchingSerializer(serializers.ModelSerializer):
@@ -32,6 +32,7 @@ class TemporalMatchingSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = TemporalMatching
-        fields = ('id', 'offer' ,'beneficiary', 'status', 'quantity')
+        depth = 2
+        fields = ('id', 'offer' ,'beneficiary', 'status', 'quantity','date')
         
-        
+    
