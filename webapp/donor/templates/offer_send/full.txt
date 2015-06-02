@@ -1,0 +1,10 @@
+{% load i18n %}
+
+{% url "profiles:activate-profile" hashed_key=key as activate_profile_url %}
+
+
+Hi {{ user.first_name }},
+
+We have food for you {{ default_http_protocol }}://{{ current_site }}{{ activate_profile_url }}
+
+Cheers

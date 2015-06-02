@@ -36,7 +36,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
+    # 3rd party
+    'pinax.notifications',
+    # food
     'profiles',
     'donor',
     'beneficiary',

@@ -18,7 +18,6 @@ class BeneficiaryAdmin(admin.ModelAdmin):
             'fields': ('num_meals', 'food_category', 'dont_accept', 'accept_meat_issue', 'accept_rel_issue', 'preference_info')
         }),
         (_('Storage capacity'), {
-#            'classes': ('collapse',),
             'fields': ('frozen_capacity', 'refrigerated_capacity', 'drystorage_capacity',)
         }),
 
