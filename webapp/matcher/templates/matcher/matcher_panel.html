@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block extrahead %}
+<script type="text/javascript" src="/jsi18n/"></script> 
 <script type="text/javascript" src="/static/admin/js/core.js"></script>
 <script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
 <script type="text/javascript" src="/static/admin/js/jquery.js"></script>
@@ -19,7 +20,7 @@
 <script type="text/javascript" src="/static/admin/js/calendar.js"></script>
 <script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
 {% endblock %}
-{% block bodyclass %}" ng-app="angApp{% endblock %}
+{% block bodyclass %}angular" ng-app="angApp{% endblock %}
 {% block content %}
         {% block object-tools %}{% endblock %}
         {{ content }}
@@ -30,7 +31,11 @@
                 <div class="form-row field-date">
                     <div>
                         <label class="required" for="id_date">Date:</label>
-                        <input class="vDateField" id="id_date" name="date" size="10" type="text" ng-model="income_date"  ng-change="getList(income_date)"><span class="datetimeshortcuts">&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, 0);">Today</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.openCalendar(0);" id="calendarlink0"><img src="/static/admin/img/icon_calendar.gif" alt="Calendar"></a></span>
+                        <input class="vDateField" id="id_date" 
+                               name="date" size="10" type="text" 
+                               ng-model="incomedate"  
+                               ng-change="getList(incomedate)"
+                               >
                     </div>
                 </div>
                 <div class="form-row field-date">
@@ -62,15 +67,10 @@
                                   </tr>
                               </thead>
                               <tbody>
-                                  <tr>
-                                      <th>1</th>
-                                      <th>bbbbbb</th>
-                                      <th>cccccc</th>
-                                  </tr>
-                                  <tr>
-                                      <th>2</th>
-                                      <th>bbbbbb</th>
-                                      <th>cccccc</th>
+                                  <tr ng-repeat="item in items" ng-click="viewDonorInInfoBox(item.offer);">
+                                      <th>[[item.offer.id]]</th>
+                                      <th>[[item.offer.name]]</th>
+                                      <th>est_mass:[[item.offer.estimated_mass]]</th>
                                   </tr>
                               </tbody>
                             </table>
@@ -84,25 +84,24 @@
                                 Select:
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.active" value="pending"> pending
+                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value="pending"> pending
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio2" ng-model="select.active" value="waiting"> waiting
+                                  <input type="radio" name="Options" id="inlineRadio2" ng-model="select.status" value="waiting"> waiting
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio3" ng-model="select.active" value="confirmed"> confirmed
+                                  <input type="radio" name="Options" id="inlineRadio3" ng-model="select.status" value="confirmed"> confirmed
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio4" ng-model="select.active" value="accepted"> accepted
+                                  <input type="radio" name="Options" id="inlineRadio4" ng-model="select.status" value="accepted"> accepted
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio5" ng-model="select.active" value="assigned"> assigned
+                                  <input type="radio" name="Options" id="inlineRadio5" ng-model="select.status" value="assigned"> assigned
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio6" ng-model="select.active" value="notified"> notified
+                                  <input type="radio" name="Options" id="inlineRadio6" ng-model="select.status" value="notified"> notified
                                 </label>
                             </div>
-                            ---[[select.active]]---
                             <div class="box">
                                 <table class="table table-hover">
                                   <thead>
@@ -118,38 +117,17 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      <tr>
+                                      <tr ng-repeat="item in items | filter:status:true " ng-click="viewBenInInfoBox(item.beneficiary)">
                                           <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
-                                          <th>1</th>
-                                          <th>aaassa</th>
-                                          <th>bbbfdfd</th>
-                                          <th>cssdd</th>
-                                          <th>dfffdd</th>
-                                          <th>egggfff</th>
-                                          <th>fassddd</th>
+                                          <th>[[item.beneficiary.id]]</th>
+                                          <th>[[item.beneficiary.group.name]]</th>
+                                          <st stat="item"></st>
+                                          <th>[[item.beneficiary.num_meals]]</th>
+                                          <th>[[item.quantity]]</th>
+                                          <th>??????</th>
+                                          <th>??????</th>
                                       </tr>
-                                      <tr>
-                                          <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
-                                          <th>2</th>
-                                          <th>aaassa</th>
-                                          <th>bbbfdfd</th>
-                                          <th>cssdd</th>
-                                          <th>dfffdd</th>
-                                          <th>egggfff</th>
-                                          <th>fassddd</th>
-                                      </tr>
-                                      <tr>
-                                          <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
-                                          <th>3</th>
-                                          <th>aaassa</th>
-                                          <th>bbbfdfd</th>
-                                          <th>cssdd</th>
-                                          <th>dfffdd</th>
-                                          <th>egggfff</th>
-                                          <th>fassddd</th>
-                                      </tr>
-
-                                  </tbody>
+                                    </tbody>
                                 </table>
                             </div>
                             <div class="box">
@@ -169,13 +147,13 @@
                         <div class="field-box field-meat_issue">
 <!--                            <label class="required" for="">Donor:</label>-->
                             <div class="info_box">
-                                <h1>{[{name}]}</h1>
-                                <div>Delivery name:</div>
-                                <div>Beneficiary groups:</div>
-                                <div>Food category:</div>
-                                <div>Estimated mass:</div>
-                                <div>Temperature:</div>
-                                <div>Packaging:</div>
+                                <h1>[[viewDonor.name]]</h1>
+                                <div>Delivery name:????</div>
+                                <div>Beneficiary groups:[[viewDonor.beneficiary_group.name]]</div>
+                                <div>Food category:[[viewDonor.food_category]]</div>
+                                <div>Estimated mass:[[viewDonor.estimated_mass]]</div>
+                                <div>Temperature:[[viewDonor.temperature]]</div>
+                                <div>Packaging:[[viewDonor.packaging]]</div>
                             </div>
                         </div>
                     </div>
@@ -185,16 +163,16 @@
                     <div class="field-box field-meat_issue">
 <!--                            <label class="required" for="">Beneficiary:</label>-->
                         <div class="info_box">
-                            <h1>{[{name}]}</h1>
-                            <div>Belongs to:</div>
-                            <div>Current storage capacity:</div>
+                            <h1>[[viewBen.group.name]]</h1>
+                            <div>Belongs to:[[viewBen.group.name]]</div>
+                            <div>Current storage capacity:[[viewBen.</div>
                             <ul>
-                                <li>frozen:40</li>
-                                <li>refrigerated:45</li>
-                                <li>dry storage:90</li>
+                                <li>frozen:[[viewBen.frozen_capacity]]</li>
+                                <li>refrigerated:[[viewBen.refrigerated_capacity]]</li>
+                                <li>dry storage:[[viewBen.drystorage_capacity]]</li>
                             </ul>
                             <div class="info_box">
-                                Aditional info
+                                [[viewBen.preference_info]]
                             </div>
                         </div>
                     </div>
@@ -233,7 +211,9 @@
 
         })(django.jQuery);
     </script>
+    <script src="/static/bower_components/lodash/lodash.js"></script>
     <script src="/static/bower_components/angular/angular.js"></script>
+    <script src="/static/bower_components/restangular/dist/restangular.js"></script>
     <script src="/static/bower_components/restangular/dist/restangular.min.js"></script>
     <script src="/static/app/scripts/app.js"></script>
 <div class="calendarbox module" id="calendarbox0" style="display: none; position: absolute; left: 284px; top: 143px;">
