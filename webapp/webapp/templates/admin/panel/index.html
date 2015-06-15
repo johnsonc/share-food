@@ -25,10 +25,15 @@
     {% if perms.matcher %}
         <li role="presentation"><a href="{% url 'admin:matcher_matched_changelist' %}">{% trans 'Delivery schedule' %}</a></li>
     {% endif %}
+    
+        <li role="presentation"><a href="/admin/matcher_panel/">{% trans 'Matcher' %}</a></li>
+    
 
     {% if perms.profiles %}
+        
         <li role="presentation"><a href="{% url 'admin:profiles_organization_change' user.organization.pk %}">{% trans 'Organization' %}</a></li>
         <li role="presentation"><a href="{% url 'admin:profiles_profile_change' user.profile.pk %}">{% trans 'Profile' %}</a></li>
+    
     {% endif %}
     {% if perms.profiles %}
         <li role="presentation"><a href="{% url 'admin:matcher_routing_changelist' %}">{% trans 'Driver schedule' %}</a></li>

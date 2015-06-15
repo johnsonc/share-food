@@ -51,6 +51,7 @@ class TemporalMatching(models.Model):
 #        return '%s - %s @%s' (self.offer, self.beneficiary, str(self.date))
         return self.offer.name+" - "+self.beneficiary.group.name
 
+
 class VisitPoint(models.Model):
     STATUS = (
         ('p', _('Pending')),
@@ -66,6 +67,14 @@ class VisitPoint(models.Model):
     class Meta:
         verbose_name = _('Visit point')
         verbose_name_plural = _('Visit points')
+        ordering = ['seq_num']
+
+
+    def __unicode__(self):
+        if self.donor:
+            return self.matched.offer.address
+        else:
+            return self.matched.beneficiary.user.organization.address
 
 
 """
@@ -91,8 +100,8 @@ class Matched(models.Model):
     quantity = models.FloatField()
 
     class Meta:
-        verbose_name = _('Delivery schedule')
-        verbose_name_plural = _('Delivery schedules')
+        verbose_name = _('Delivery schedule (Match)')
+        verbose_name_plural = _('Delivery schedules (Matches)')
         permissions = (
             ('readonly', 'Can read matches'),
         )

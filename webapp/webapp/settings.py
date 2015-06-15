@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = (
+    
     'webapp',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,6 +48,7 @@ INSTALLED_APPS = (
     'matcher',
     'dictionaries',
     'api',
+    
 )
 
 MIDDLEWARE_CLASSES = (

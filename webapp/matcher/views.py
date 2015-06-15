@@ -20,6 +20,7 @@ from django.core.urlresolvers import reverse
 from .models import VisitPoint
 from .forms import ChooseDateAndDriver
 
+
 def driver_shedule(request, routing_id=None):
     return render_to_response('admin/matcher/driver_schedule', {},  context_instance=RequestContext(request))
 
@@ -29,6 +30,35 @@ def confirm_visit_point(request, visit_point):
     vp = get_object_or_404(VisitPoint, pk=visit_point)
     vp.status = 'c'
     vp.save()
+    return HttpResponseRedirect(reverse('admin:matcher_visitpoint_changelist'))
+
+@login_required()
+def move_up(request, visit_point):
+    vp = get_object_or_404(VisitPoint, pk=visit_point)
+    visit_points = [v for v in vp.routing.visitpoints.all()]
+
+    for x in range(len(visit_points)):
+        if visit_points[x] == vp and x > 0:
+            visit_points[x] = visit_points[x-1]
+            visit_points[x-1] = vp
+
+    for x in range(len(visit_points)):
+        visit_points[x].seq_num = x
+        visit_points[x].save()
+    return HttpResponseRedirect(reverse('admin:matcher_visitpoint_changelist'))
+
+@login_required()
+def move_down(request, visit_point):
+    vp = get_object_or_404(VisitPoint, pk=visit_point)
+    visit_points = [v for v in vp.routing.visitpoints.all()]
+    for x in range(1, len(visit_points)):
+        if visit_points[x-1] == vp:
+            visit_points[x-1] = visit_points[x]
+            visit_points[x] = vp
+
+    for x in range(len(visit_points)):
+        visit_points[x].seq_num = x
+        visit_points[x].save()
     return HttpResponseRedirect(reverse('admin:matcher_visitpoint_changelist'))
 
 

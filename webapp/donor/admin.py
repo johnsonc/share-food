@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 class RepetitionInline(admin.StackedInline):
     model = OfferRepetition
     verbose_name_plural = _('Repetitions')
-    max_num = 1
+    #max_num = 10
 
 
 class OfferAdmin(admin.ModelAdmin):
