@@ -23,7 +23,7 @@ class Routing(models.Model):
         verbose_name_plural = _('Routings')
 
     def __unicode__(self):
-        return self.driver.user.username
+        return str(self.date)
 
 
 class TemporalMatching(models.Model):
@@ -52,19 +52,23 @@ class TemporalMatching(models.Model):
         return self.offer.name+" - "+self.beneficiary.group.name
 
 class VisitPoint(models.Model):
+    STATUS = (
+        ('p', _('Pending')),
+        ('c', _('Confirmed')),
+    )
+
     seq_num = models.PositiveSmallIntegerField()
     matched = models.ForeignKey('Matched', to_field='id')
-    status = models.PositiveSmallIntegerField()
-    donor = models.BooleanField(default=True)
+    status = models.CharField(max_length=1, choices=STATUS, default='p')
+    donor = models.BooleanField(default=False)
+    routing = models.ForeignKey('Routing', related_name='visitpoints', null=True, blank=True)
 
     class Meta:
         verbose_name = _('Visit point')
         verbose_name_plural = _('Visit points')
 
-    def __unicode__(self):
-        return '%s' (self.seq_num)
 
-
+"""
 class Delivery(models.Model):
     routing = models.ForeignKey(Routing)
     visit_point = models.ForeignKey(VisitPoint)
@@ -75,6 +79,7 @@ class Delivery(models.Model):
 
     def __unicode__(self):
         return 'deliver for %s' (self.routing)
+"""
 
 
 class Matched(models.Model):
@@ -86,8 +91,11 @@ class Matched(models.Model):
     quantity = models.FloatField()
 
     class Meta:
-        verbose_name = _('Match')
-        verbose_name_plural = _('Matches')
+        verbose_name = _('Delivery schedule')
+        verbose_name_plural = _('Delivery schedules')
+        permissions = (
+            ('readonly', 'Can read matches'),
+        )
 
     def __unicode__(self):
-        return '%s - %s @%s' (self.offer, self.beneficiary, str(self.date))
+        return '%s' % str(self.date)

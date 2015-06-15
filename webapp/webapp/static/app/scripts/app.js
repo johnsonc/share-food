@@ -17,11 +17,21 @@ app.config(function(RestangularProvider) {
 app.controller("matching",function($scope,Restangular){
     
     var temp_matching = Restangular.all('temporal_matching');
+    var mapping = [];
+    mapping['1'] = "pending";
+    mapping['2'] = "waiting";
+    mapping['3'] = "confirmed";
+    mapping['4'] = "accepted";
+    mapping['5'] = "assigned";
+    mapping['6'] = "notified";
     
     $scope.$watch(
         function($scope){return $scope.incomedate},
         function(newValue, oldValue){
             temp_matching.customGET("",{'date':""+newValue}).then(function(items){
+                angular.forEach(items,function(item){
+                    item.status_maped = mapping[item.status];
+                });
                 $scope.items = items;
                 console.log(items);
             });

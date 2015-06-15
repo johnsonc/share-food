@@ -1,11 +1,11 @@
-from django.contrib import admin
+from panel.admin import site
 from .models import *
 
-admin.site.register(FoodCategory)
-admin.site.register(MeatIssues)
-admin.site.register(ReligiousIssues)
-admin.site.register(PackagingCategory)
-admin.site.register(TemperatureCategory)
-admin.site.register(FoodIngredients)
-admin.site.register(DaysOfTheWeek)
+site.register(FoodCategory)
+site.register(MeatIssues)
+site.register(ReligiousIssues)
+site.register(PackagingCategory)
+site.register(TemperatureCategory)
+site.register(FoodIngredients)
+site.register(DaysOfTheWeek)
 

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from profiles.models import Organization
 from dictionaries.models import FoodCategory, FoodIngredients, MeatIssues, ReligiousIssues
 
+
 class BeneficiaryGroup(models.Model):
     name = models.CharField(max_length=255)
 
@@ -29,14 +30,20 @@ class Beneficiary(models.Model):
     preference_info = models.TextField(_('Additional info:'))
     last_delivery = models.DateField(blank=True, null=True)
 
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, related_name='beneficiary_profile')
 
     class Meta:
         verbose_name = _('Beneficiary')
         verbose_name_plural = _('Beneficiaries')
 
+    def get_meta(self):
+        return self._meta
+
     def __unicode__(self):
         return self.user.username
+
+    def get_timewindows(self):
+        return self.deliveries.all()
 
 
 class DeliveryTimeWindows(models.Model):

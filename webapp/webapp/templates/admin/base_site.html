@@ -1,9 +1,18 @@
 {% extends "admin/base.html" %}
 {% load staticfiles %}
+{% load i18n %}
 {% block title %}Maple Leaf Harvest{% endblock %}
 
 {% block branding %}
 <h1 id="site-name"><a href="{% url 'admin:index' %}"><img src="{% static 'images/logo.png' %}" />Maple Leaf Harvest</a></h1>
 {% endblock %}
+
+ {% block breadcrumbs %}
+    <div class="breadcrumbs">
+    <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+    </div>
+    {% endblock %}
 
 {% block nav-global %}{% endblock %}
