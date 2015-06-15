@@ -6,6 +6,8 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from .models import VisitPoint
 from .forms import ChooseDateAndDriver
+from django.utils.http import urlencode
+
 
 
 def driver_shedule(request, routing_id=None):
@@ -17,7 +19,8 @@ def confirm_visit_point(request, visit_point):
     vp = get_object_or_404(VisitPoint, pk=visit_point)
     vp.status = 'c'
     vp.save()
-    return HttpResponseRedirect(reverse('admin:matcher_visitpoint_changelist'))
+    return HttpResponseRedirect('%s?%s' % (reverse('admin:matcher_visitpoint_changelist'),
+                                           request.GET.urlencode()))
 
 @login_required()
 def move_up(request, visit_point):
@@ -32,7 +35,9 @@ def move_up(request, visit_point):
     for x in range(len(visit_points)):
         visit_points[x].seq_num = x
         visit_points[x].save()
-    return HttpResponseRedirect(reverse('admin:matcher_visitpoint_changelist'))
+
+    return HttpResponseRedirect(u'%s?%s' % (reverse('admin:matcher_visitpoint_changelist'),
+                                                    request.GET.urlencode()))
 
 @login_required()
 def move_down(request, visit_point):
@@ -46,7 +51,8 @@ def move_down(request, visit_point):
     for x in range(len(visit_points)):
         visit_points[x].seq_num = x
         visit_points[x].save()
-    return HttpResponseRedirect(reverse('admin:matcher_visitpoint_changelist'))
+    return HttpResponseRedirect('%s?%s' % (reverse('admin:matcher_visitpoint_changelist'),
+                                            request.GET.urlencode()))
 
 
 def match_on(request):

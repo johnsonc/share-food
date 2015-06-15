@@ -27,16 +27,33 @@ class Routing(models.Model):
 
 
 class TemporalMatching(models.Model):
+
+    STATUS = (
+        ('p', _('Pending')),
+        ('c', _('Confirmed')),
+        ('a', _('Accepted')),
+        ('w', _('Waiting'))
+    )
+
     offer = models.ForeignKey('donor.Offer')
     beneficiary = models.ForeignKey('beneficiary.Beneficiary')
     date = models.DateField()
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
     status = models.PositiveSmallIntegerField()
+    hash = models.IntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = _('Temporal match')
         verbose_name_plural = _('Temporal matchings')
+
+    def send_offer(self):
+        self.status = 'w'
+        
+
+    def offer_accepted(self, hash):
+        if hash == self.hash:
+            self.status = 'c'
 
 
 class VisitPoint(models.Model):

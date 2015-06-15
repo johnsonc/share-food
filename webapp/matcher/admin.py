@@ -83,6 +83,7 @@ class VisitPointByDateFrom(admin.SimpleListFilter):
         if self.value():
             return queryset.filter(routing__date__gte=self.value())
 
+
 class VisitPointByDateTo(admin.SimpleListFilter):
     title = _('date to')
     parameter_name = 'date_to'
@@ -106,7 +107,9 @@ class VisitPointAdmin(admin.ModelAdmin):
 
     model = VisitPoint
 
-    list_display = ('seq_num', 'name', 'address', 'driver', 'status',
+    #change_list_template = 'matcher/change_list_visitpoint.html'
+
+    list_display = ('name', 'address', 'driver', 'status',
                     'date', 'time', 'details_link', 'confirm', 'up', 'down')
 
     list_filter = (VisitPointsByDriver, VisitPointByDate, VisitPointByDateFrom, VisitPointByDateTo)
@@ -158,20 +161,23 @@ class VisitPointAdmin(admin.ModelAdmin):
         print self
         print instance
         #print //window.location.href=location.protocol + '//' + location.host + location.pathname; else window.location.href=location.protocol + '//' + location.host + location.pathname+this.value;
-        return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('admin:matcher_matched_change',
+        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('admin:matcher_matched_change',
                                                                        args=(instance.matched.id,)),
+                                                    '?'+self.param.urlencode() if self.param else '',
                                                                         _('Details')))
     def confirm(self, instance):
-        return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('confirm_visit_point', args=(instance.id,)),
+        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('confirm_visit_point', args=(instance.id,)),
+                                                    '?'+self.param.urlencode() if self.param else '',
                                                                         _('Confirm')))
 
     def up(self, instance):
 
-        return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('move_up', args=(instance.id,)),
+        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('move_up', args=(instance.id,)),
+                                                    '?'+self.param.urlencode() if self.param else '',
                                                                         _('Up')))
     def down(self, instance):
-        return mark_safe('<a href="%s?%s">%s</a>' % (urlresolvers.reverse('move_down', args=(instance.id, )),
-                                                  self.param.urlencode(), _('Down')))
+        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('move_down', args=(instance.id, )),
+                                                  '?'+self.param.urlencode() if self.param else '', _('Down')))
     def get_actions(self, request):
         actions = super(VisitPointAdmin, self).get_actions(request)
         if 'delete_selected' in actions:
