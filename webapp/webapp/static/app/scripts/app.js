@@ -53,7 +53,7 @@ angular.module('angApp.directives')
             });
             
         },
-        template: '<th>[[stat.status]]</th>'
+        template: '<th>[[status]]</th>'
       };
 });
 
