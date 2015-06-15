@@ -28,7 +28,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,12 +38,14 @@ INSTALLED_APPS = (
     # 3rd party
     'pinax.notifications',
     # food
+    'panel',
     'profiles',
     'donor',
     'beneficiary',
     'matcher',
     'dictionaries',
     'webapp',
+
 )
 
 MIDDLEWARE_CLASSES = (
@@ -55,6 +56,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.contrib.messages.context_processors.messages',
 )
 
 ROOT_URLCONF = 'webapp.urls'

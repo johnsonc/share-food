@@ -11,11 +11,11 @@ import pytz
 
 class Donor(models.Model):
     default_beneficiary_group = models.ManyToManyField(BeneficiaryGroup, verbose_name=_('Beneficiary group'))
-    user = models.OneToOneField(User, related_name='donor_profile')
+    user = models.OneToOneField(User, related_name='donor_group')
 
 
 class Offer(models.Model):
-    donor = models.ForeignKey(User)
+    donor = models.ForeignKey(User, related_name='donor_profile')
     name = models.CharField(_('Delivery name'), max_length=255)
 
     food_category = models.ForeignKey(FoodCategory, verbose_name=_('Food category'))

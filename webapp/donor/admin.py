@@ -1,4 +1,5 @@
 from django.contrib import admin
+from panel.admin import site
 from django.utils.translation import ugettext as _
 
 from .models import OfferRepetition, Offer#, Donnor
@@ -10,10 +11,9 @@ class RepetitionInline(admin.StackedInline):
     max_num = 1
 
 
-@admin.register(Offer)
 class OfferAdmin(admin.ModelAdmin):
-    fieldsets = (
-        (None, {
+    fieldsets = [
+        ('General', {
             'fields': ('name', ('food_category', 'estimated_mass',), 'contact_person')
         }),
         ('Beneficiary groups', {
@@ -32,10 +32,15 @@ class OfferAdmin(admin.ModelAdmin):
         ('Time info', {
             'fields': (('time_from', 'time_to',),)
         }),
-        )
+        ]
+
     inlines = [
         RepetitionInline
         ]
+
+    list_display = ('name', 'estimated_mass', 'temperature', 'time_from', 'time_to', 'packaging')
+
+    #list_filter = ('food_category', 'temperature', 'packaging')
 
     def active(self, obj):
         return True
@@ -44,11 +49,17 @@ class OfferAdmin(admin.ModelAdmin):
         self.exclude = []
         if not request.user.is_superuser:
             self.exclude.append('donor') #here!
+            if self.fieldsets[0][0] == 'Donor':
+                self.fieldsets = self.fieldsets[1:]
+        else:
+            if self.fieldsets[0][0] == 'General':
+                self.fieldsets.insert(0, ('Donor', {'fields': ('donor',)}))
+
         return super(OfferAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
-            obj.donor = request.user.profile.organization
+            obj.donor = request.user
         obj.save()
 
     def get_queryset(self, request):
@@ -56,6 +67,9 @@ class OfferAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(donor=request.user)
+
+site.register(Offer, OfferAdmin)
+
 """
 @admin.register(Donnor)
 class DonorAdmin(admin.ModelAdmin):
