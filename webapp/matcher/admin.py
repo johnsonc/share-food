@@ -33,11 +33,85 @@ class MatchAdmin(admin.ModelAdmin):
                          Q(driver__user=request.user))
 
 
+class VisitPointsByDriver(admin.SimpleListFilter):
+    title = _('driver')
+    parameter_name = 'driver'
+    template = 'matcher/filter_driver.html'
+
+    def lookups(self, request, model_admin):
+        drivers = Driver.objects.all().order_by('user__username')
+        return ((a.id, a.user.username) for a in drivers)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(routing__driver=self.value())
+
+
+class VisitPointByDate(admin.SimpleListFilter):
+    title = _('date')
+    parameter_name = 'date'
+    template = 'matcher/filter_date.html'
+
+    def lookups(self, request, model_admin):
+        from datetime import date
+        dates = set()
+        routings = Routing.objects.all().order_by('-date')[:100]
+
+        [dates.add(r) for r in routings]
+
+        return ((d, d) for d in dates)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(routing__date=self.value())
+
+class VisitPointByDateFrom(admin.SimpleListFilter):
+    title = _('date from')
+    parameter_name = 'date_from'
+    template = 'matcher/filter_date.html'
+
+    def lookups(self, request, model_admin):
+        from datetime import date
+        dates = set()
+        routings = Routing.objects.all().order_by('-date')
+
+        [dates.add(r) for r in routings]
+
+        return ((d, d) for d in dates)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(routing__date__gte=self.value())
+
+class VisitPointByDateTo(admin.SimpleListFilter):
+    title = _('date to')
+    parameter_name = 'date_to'
+    template = 'matcher/filter_date.html'
+
+    def lookups(self, request, model_admin):
+        from datetime import date
+        dates = set()
+        routings = Routing.objects.all().order_by('-date')
+
+        [dates.add(r) for r in routings]
+
+        return ((d, d) for d in dates)
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(routing__date__lte=self.value())
+
+
 class VisitPointAdmin(admin.ModelAdmin):
 
     model = VisitPoint
 
-    list_display = ('name', 'address', 'driver', 'status', 'date', 'time', 'details_link', 'confirm')
+    list_display = ('seq_num', 'name', 'address', 'driver', 'status',
+                    'date', 'time', 'details_link', 'confirm', 'up', 'down')
+
+    list_filter = (VisitPointsByDriver, VisitPointByDate, VisitPointByDateFrom, VisitPointByDateTo)
+
+    list_display_links = None
 
     fields = ('status', 'donor', 'seq_num', 'matched')
 
@@ -81,17 +155,39 @@ class VisitPointAdmin(admin.ModelAdmin):
             return timewindows
 
     def details_link(self, instance):
+        print self
+        print instance
+        #print //window.location.href=location.protocol + '//' + location.host + location.pathname; else window.location.href=location.protocol + '//' + location.host + location.pathname+this.value;
         return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('admin:matcher_matched_change',
                                                                        args=(instance.matched.id,)),
                                                                         _('Details')))
     def confirm(self, instance):
-        return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('confirm_visit_point',
-                                                                        _('Confirm'))))
+        return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('confirm_visit_point', args=(instance.id,)),
+                                                                        _('Confirm')))
 
+    def up(self, instance):
+
+        return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('move_up', args=(instance.id,)),
+                                                                        _('Up')))
+    def down(self, instance):
+        return mark_safe('<a href="%s?%s">%s</a>' % (urlresolvers.reverse('move_down', args=(instance.id, )),
+                                                  self.param.urlencode(), _('Down')))
+    def get_actions(self, request):
+        actions = super(VisitPointAdmin, self).get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+
+    def changelist_view(self, request, extra_context=None):
+        self.param = request.GET
+
+        return super(VisitPointAdmin, self).changelist_view(request, extra_context=extra_context)
 
 class VisitPointInline(admin.TabularInline):
     model = VisitPoint
-    fields = ('matched', 'donor', 'seq_num')
+
+    fields = ('matched', 'donor', 'seq_num' )
+
+    readonly_fields = ('matched', )
 
 
 class RoutingAdmin(admin.ModelAdmin):
@@ -99,13 +195,14 @@ class RoutingAdmin(admin.ModelAdmin):
 
     list_display = ('date', 'driver', 'get_visit_points_link', )
 
-    list_filter = ('date', )
+    list_filter = ('date',)
 
     fields = ('date', )
 
     exclude = ('driver', )
 
     inlines = [VisitPointInline]
+
 
     def get_queryset(self, request):
         qs = super(RoutingAdmin, self).get_queryset(request)

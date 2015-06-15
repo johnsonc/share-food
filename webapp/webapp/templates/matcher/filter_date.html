@@ -1,0 +1,10 @@
+{% load i18n %}
+<h3>{% blocktrans with filter_title=title %} By {{ filter_title }} {% endblocktrans %}</h3>
+<p>
+    <select onchange="if (this.selectedIndex==0) window.location.href=location.protocol + '//' + location.host + location.pathname; else window.location.href=location.protocol + '//' + location.host + location.pathname+this.value;">
+    {% for choice in choices %}
+        <option value="{{ request.path }}{{ choice.query_string|iriencode }}" {% if choice.selected %} selected class="selected"{% endif %}>
+        {{ choice.display }}</option>
+    {% endfor %}
+    </select>
+</p>

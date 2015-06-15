@@ -13,12 +13,10 @@ class DeliveriesInline(admin.StackedInline):
     verbose_name_plural = _('Deliveries')
 
 
-
-#@admin.register(Beneficiary)
 class BeneficiaryAdmin(admin.ModelAdmin):
     fieldsets = (
         (_('Basic info'), {
-            'fields': ('num_meals', 'group', 'food_category', 'dont_accept', 'accept_meat_issue', 'accept_rel_issue', 'preference_info')
+            'fields': ('num_meals', 'group', 'user')
         }),
         (_('Storage capacity'), {
             'fields': ('frozen_capacity', 'refrigerated_capacity', 'drystorage_capacity',)
@@ -38,6 +36,10 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         self.exclude = []
         if not request.user.is_superuser:
             self.exclude.append('user')
+        #else:
+        #    if self.fieldsets[0][0] == 'Beneficiary':
+        #        self.fieldsets.insert(0, ('Beneficiary', {'fields': ('user',)}))
+
         return super(BeneficiaryAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
@@ -48,7 +50,7 @@ class BeneficiaryAdmin(admin.ModelAdmin):
     def response_add(self, request, obj, post_url_continue="../%s/"):
         super(BeneficiaryAdmin, self).response_add(request, obj, post_url_continue)
 
-        return HttpResponseRedirect(urlresolvers.reverse('admin:app_index'))
+        return HttpResponseRedirect(urlresolvers.reverse('admin:index'))
 
     def response_change(self, request, obj):
         super(BeneficiaryAdmin, self).response_change(request, obj)
