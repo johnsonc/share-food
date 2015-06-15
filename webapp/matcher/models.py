@@ -47,10 +47,6 @@ class TemporalMatching(models.Model):
         verbose_name = _('Temporal match')
         verbose_name_plural = _('Temporal matchings')
 
-    def __unicode__(self):
-#        return '%s - %s @%s' (self.offer, self.beneficiary, str(self.date))
-        return self.offer.name+" - "+self.beneficiary.group.name
-
 
 class VisitPoint(models.Model):
     STATUS = (

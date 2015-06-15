@@ -1,8 +1,8 @@
 {% extends 'admin/base_site.html' %}
-{% load i18n %}
+{% load i18n admin_static %}
 
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">
-{% trans "Home" %}</a> > Matcher</div>{% endblock %}
+{% trans "Home" %}</a> > {% trans "Matcher"%}</div>{% endblock %}
 
 {% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
@@ -24,13 +24,13 @@
 {% block content %}
         {% block object-tools %}{% endblock %}
         {{ content }}
-        <h1>Matcher</h1>
+        <h1>{% trans "Matcher"%}</h1>
         
         <div id="content-main" ng-controller="matching">
             <fieldset class="module aligned">
                 <div class="form-row field-date">
                     <div>
-                        <label class="required" for="id_date">Date:</label>
+                        <label class="required" for="id_date">{% trans "Date:"%}</label>
                         <input class="vDateField" id="id_date" 
                                name="date" size="10" type="text" 
                                ng-model="incomedate"  
@@ -40,13 +40,13 @@
                 </div>
                 <div class="form-row field-date">
                     <div>
-                        <label class="required" for="id_date">Mass unit:</label>
+                        <label class="required" for="id_date">{% trans "Mass unit:"%}</label>
                         <div class="mass_unit" ng-model="form">
                             <label class="radio">
-                              <input type="radio" name="iROptions" id="inlineRadio1" value="kg" ng-model="form.mass_unit" > kg
+                              <input type="radio" name="iROptions" id="inlineRadio1" value="kg" ng-model="form.mass_unit" > {% trans "kg"%}
                             </label>
                             <label class="radio">
-                              <input type="radio" name="iROptions" id="inlineRadio2" value="pounds" ng-model="form.mass_unit"> pounds
+                              <input type="radio" name="iROptions" id="inlineRadio2" value="pounds" ng-model="form.mass_unit"> {% trans "pounds"%}
                             </label>
                             [[form]]
                         </div>
@@ -56,75 +56,75 @@
             
                 <div class="form-row field-meat_issue field-rel_issue">
                     <div class="field-box field-meat_issue">
-                        <label class="required" for="">Donors:</label>
+                        <label class="required" for="">{% trans "Donors:"%}</label>
                         <div class="related-widget-wrapper">
                             <table class="table table-hover">
                               <thead>
                                   <tr>
-                                      <th>ID</th>
-                                      <th>Donnor</th>
-                                      <th>Accepted[%]</th>
+                                      <th>{% trans "ID"%}</th>
+                                      <th>{% trans "Donnor"%}</th>
+                                      <th>{% trans "Accepted[%]"%}</th>
                                   </tr>
                               </thead>
                               <tbody>
-                                  <tr ng-repeat="item in items" ng-click="viewDonorInInfoBox(item.offer);">
+                                  <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);">
                                       <th>[[item.offer.id]]</th>
                                       <th>[[item.offer.name]]</th>
-                                      <th>est_mass:[[item.offer.estimated_mass]]</th>
+                                      <th>?????</th>
                                   </tr>
                               </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="field-box field-rel_issue">
-                        <label class="required inline" for="">Beneficiary:</label>
+                        <label class="required inline" for="">{% trans "Beneficiary:"%}</label>
                         <div class="related-widget-wrapper">
                             <div class="box" ng-model="select">
                                 <label class="radio-inline">
-                                Select:
+                                {% trans "Select:"%}
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value="pending"> pending
+                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value="1"> {% trans "pending"%}
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio2" ng-model="select.status" value="waiting"> waiting
+                                  <input type="radio" name="Options" id="inlineRadio2" ng-model="select.status" value="2"> {% trans "waiting"%}
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio3" ng-model="select.status" value="confirmed"> confirmed
+                                  <input type="radio" name="Options" id="inlineRadio3" ng-model="select.status" value="3"> {% trans "confirmed"%}
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio4" ng-model="select.status" value="accepted"> accepted
+                                  <input type="radio" name="Options" id="inlineRadio4" ng-model="select.status" value="4"> {% trans "accepted"%}
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio5" ng-model="select.status" value="assigned"> assigned
+                                  <input type="radio" name="Options" id="inlineRadio5" ng-model="select.status" value="5"> {% trans "assigned"%}
                                 </label>
                                 <label class="radio-inline">
-                                  <input type="radio" name="Options" id="inlineRadio6" ng-model="select.status" value="notified"> notified
+                                  <input type="radio" name="Options" id="inlineRadio6" ng-model="select.status" value="6"> {% trans "notified"%}
                                 </label>
                             </div>
                             <div class="box">
-                                <table class="table table-hover">
+                                <table class="table table-hover" ng-model="sum">
                                   <thead>
                                       <tr>
                                           <th>#</th>
-                                          <th>ID</th>
-                                          <th>Bebeficiary</th>
-                                          <th>Status</th>
-                                          <th>Num Meals</th>
-                                          <th>Quantity</th>
-                                          <th>Last delivery [days]</th>
-                                          <th>Distance [miles]</th>
+                                          <th>{% trans "ID"%}</th>
+                                          <th>{% trans "Bebeficiary"%}</th>
+                                          <th>{% trans "Status"%}</th>
+                                          <th>{% trans "Num Meals"%}</th>
+                                          <th>{% trans "Quantity"%}</th>
+                                          <th>{% trans "Last delivery [days]"%}</th>
+                                          <th>{% trans "Distance [miles]"%}</th>
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      <tr ng-repeat="item in items | filter:status:true " ng-click="viewBenInInfoBox(item.beneficiary)">
-                                          <th><input type="checkbox" name="TabOptions" id="1" value=""></th>
+                                      <tr ng-repeat="item in (filtItems=(items | filter:select:false ))" ng-click="viewBenInInfoBox(item.beneficiary)">
+                                          <th><input type="checkbox" name="TabOptions" id="1" ng-model="item.beneficiary.checked"></th>
                                           <th>[[item.beneficiary.id]]</th>
                                           <th>[[item.beneficiary.group.name]]</th>
                                           <th>[[item.status_maped]]</th>
                                           <th>[[item.beneficiary.num_meals]]</th>
                                           <th>[[item.quantity]]</th>
-                                          <th>??????</th>
+                                          <th>[[item.beneficiary.last_delivery]]</th>
                                           <th>??????</th>
                                       </tr>
                                     </tbody>
@@ -133,7 +133,7 @@
                             <div class="box">
                                 <div>
                                    <label class="radio-inline">
-                                    Sum: {{sum}}
+                                    {% trans "Sum:"%} [[sumOf(filtItems)]]
                                    </label>
                                 </div>
                             </div>
@@ -142,48 +142,55 @@
                 </div>
                 </fieldset>
                 <fieldset class="module aligned half-box">
-                    <h2>Donor:</h2>
+                    <h2>{% trans "Donor:"%}</h2>
                     <div class="form-row field-meat_issue field-rel_issue">
                         <div class="field-box field-meat_issue">
 <!--                            <label class="required" for="">Donor:</label>-->
                             <div class="info_box">
                                 <h1>[[viewDonor.name]]</h1>
-                                <div>Delivery name:????</div>
-                                <div>Beneficiary groups:[[viewDonor.beneficiary_group.name]]</div>
-                                <div>Food category:[[viewDonor.food_category]]</div>
-                                <div>Estimated mass:[[viewDonor.estimated_mass]]</div>
-                                <div>Temperature:[[viewDonor.temperature]]</div>
-                                <div>Packaging:[[viewDonor.packaging]]</div>
+                                <div>{% trans "Delivery name:"%} [[viewDonor.name]]</div>
+                                <div>{% trans "Beneficiary groups:"%} [[viewDonor.beneficiary_group.name]]</div>
+                                <div>{% trans "Food category:"%} [[viewDonor.food_category]]</div>
+                                <div>{% trans "Estimated mass:"%} [[viewDonor.estimated_mass]]</div>
+                                <div>{% trans "Temperature:"%} [[viewDonor.temperature]]</div>
+                                <div>{% trans "Packaging:"%} [[viewDonor.packaging]]</div>
                             </div>
                         </div>
                     </div>
                 </fieldset>
                 <fieldset class="module aligned  half-box">
-                    <h2>Beneficiary</h2>
+                    <h2>{% trans "Beneficiary"%}</h2>
                     <div class="field-box field-meat_issue">
 <!--                            <label class="required" for="">Beneficiary:</label>-->
                         <div class="info_box">
                             <h1>[[viewBen.group.name]]</h1>
-                            <div>Belongs to:[[viewBen.group.name]]</div>
-                            <div>Current storage capacity:[[viewBen.</div>
+                            <div>{% trans "Belongs to:"%} [[viewBen.group.name]]</div>
+                            <div>{% trans "Current storage capacity:"%}?????</div>
                             <ul>
-                                <li>frozen:[[viewBen.frozen_capacity]]</li>
-                                <li>refrigerated:[[viewBen.refrigerated_capacity]]</li>
-                                <li>dry storage:[[viewBen.drystorage_capacity]]</li>
+                                <li>{% trans "frozen:"%} [[viewBen.frozen_capacity]]</li>
+                                <li>{% trans "refrigerated:"%} [[viewBen.refrigerated_capacity]]</li>
+                                <li>{% trans "dry storage:"%} [[viewBen.drystorage_capacity]]</li>
                             </ul>
                             <div class="info_box">
-                                [[viewBen.preference_info]]
+                                [[ viewBen.preference_info ]]
                             </div>
                         </div>
                     </div>
                 </fieldset>
-                <fieldset class="module aligned">
-                    <h2>Actions:</h2>
-                      <button type="button" class="btn btn-default">Send Offer</button>
-                      <button type="button" class="btn btn-default">Accept</button>
-                      <button type="button" class="btn btn-default">Assign driver</button>
-                      <button type="button" class="btn btn-default">Notify</button>
-                      <button type="button" class="btn btn-default">Cancel</button>
+                
+                <fieldset style="width:100%;" class="module aligned">
+                    <h2>{% trans "Actions:"%}</h2>
+                     {% csrf_token %}
+                      <button type="button" class="btn btn-default" 
+                          ng-click="sendOffer(items)">{% trans "Send Offer"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="accept(items)">{% trans "Accept"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="assignDriver(items)">{% trans "Assign driver"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="notify(items)">{% trans "Notify"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="cancel(items)">{% trans "Cancel"%}</button>
                 </fieldset>
                 
                                 
@@ -213,6 +220,7 @@
     </script>
     <script src="/static/bower_components/lodash/lodash.js"></script>
     <script src="/static/bower_components/angular/angular.js"></script>
+    <script src="/static/bower_components/angular-cookies/angular-cookies.js"></script>
     <script src="/static/bower_components/restangular/dist/restangular.js"></script>
     <script src="/static/bower_components/restangular/dist/restangular.min.js"></script>
     <script src="/static/app/scripts/app.js"></script>
