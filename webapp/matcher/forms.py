@@ -6,5 +6,5 @@ from django import forms
 from matcher.models import Driver
 
 class ChooseDateAndDriver(forms.Form):
-    date = forms.DateField(label=_('Choose date for matching'), default=date.today())
-    driver = forms.Select(queryset=Driver.objects.all())
+    date = forms.DateField(_('Choose date for matching'), initial=date.today())
+    driver = forms.Select(choices=Driver.objects.all())

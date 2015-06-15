@@ -1,7 +1,7 @@
 __author__ = 'darek'
 from django.conf.urls import patterns, url
 
-from .views import driver_shedule, confirm_visit_point, match_on_date
+from .views import driver_shedule, confirm_visit_point, match_on, match_on_date
 
 urlpatterns = patterns('',
     url(r'^schedule/(?P<routing_id>\d+)?/?$', driver_shedule, name="driver schedule"),
