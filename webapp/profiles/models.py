@@ -49,7 +49,7 @@ class Profile(models.Model):
     tel_2 = models.CharField(max_length=255, blank=True, null=True)
     default_mass_unit = models.CharField(max_length=5, choices=MASS_UNITS, default='kg') #Changed from positive integer
     location = models.PointField(blank=True, null=True)
-
+    driver = models.BooleanField(default=False)
     objects = models.GeoManager()
 
     class Meta:
@@ -62,15 +62,19 @@ class Profile(models.Model):
 
 def create_defaults(sender, instance, created, raw, using, update_fields, **kwargs):
     from django.contrib.gis.geos import Point
-
+    print 'create_defaults'
+    """
     if created:
-        p = Profile(user=instance,
-                    address="",
-                    tel_1="",
-                    tel_2="",
-                    default_mass_unit='kg',
-                    location=Point(-101.185547, 56.536854))
-        p.save()
+        print 'new user created'
+        p, created = Profile.objects.get_or_create(user=instance)
+        if created:
+            print 'new profile created'
+            p.address = ""
+            p.tel_1 = ""
+            p.tel_2 = ""
+            default_mass_unit = 'kg'
+            location=Point(-101.185547, 56.536854)
+            p.save()
 
         o = Organization(name=Organization.DEFAULT_ORGANIZATION_NAME,
                             address='',
@@ -83,5 +87,5 @@ def create_defaults(sender, instance, created, raw, using, update_fields, **kwar
                             location=Point(-101.185547, 56.536854),
                             user=instance)
         o.save()
-
+    """
 post_save.connect(create_defaults, sender=User)

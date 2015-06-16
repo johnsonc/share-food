@@ -2,13 +2,12 @@ from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django import forms
 
 @staff_member_required
 def matcher_panel(request):
-    print 'matcher_panel exist'
     return render_to_response('matcher/matcher_panel.html',
         context_instance=RequestContext(request))
-
 
 
 from django.shortcuts import render, render_to_response
@@ -18,13 +17,41 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from .models import VisitPoint
-from .forms import ChooseDateAndDriver
-from django.utils.http import urlencode
 
 
-
+@login_required()
 def driver_shedule(request, routing_id=None):
+    """
+    TODO: throw this away, it looks like unused
+    :param request:
+    :param routing_id:
+    :return:
+    """
     return render_to_response('admin/matcher/driver_schedule', {},  context_instance=RequestContext(request))
+
+
+class MatchConfirm(forms.Form):
+    beneficiary = forms.IntegerField(widget=forms.HiddenInput())
+
+@login_required()
+def confirm_offer(request, beneficiary_id):
+    from django.shortcuts import get_object_or_404
+    from beneficiary.models import Beneficiary
+
+    if request.method == 'POST':
+        form = MatchConfirm(request.POST)
+        if form.is_valid():
+            # TODO set status
+            return HttpResponseRedirect(reverse('admin:index'))
+    else:
+        form = MatchConfirm(initial={'beneficiary': beneficiary_id})
+        form.beneficiary = beneficiary_id
+
+    # todo Form! chyba ModelForm
+    return render_to_response('admin/matcher/confirm_offer.html',
+                              {'beneficiary': get_object_or_404(Beneficiary, pk=beneficiary_id),
+                               'form': form},
+                              context_instance=RequestContext(request))
 
 
 @login_required()
@@ -67,21 +94,3 @@ def move_down(request, visit_point):
     return HttpResponseRedirect('%s?%s' % (reverse('admin:matcher_visitpoint_changelist'),
                                             request.GET.urlencode()))
 
-
-def match_on(request):
-    if request.method == 'POST':
-        form = ChooseDateAndDriver(request.POST)
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            # ...
-            # redirect to a new URL:
-            #TODO!!!!
-            return HttpResponseRedirect('/thanks/')
-    else:
-        form = ChooseDateAndDriver()
-
-    return render(request, 'name.html', {'form': form})
-
-
-def match_on_date(request, year=None, month=None, day=None):
-    pass

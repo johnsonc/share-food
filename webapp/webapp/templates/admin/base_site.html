@@ -13,7 +13,7 @@
 
     {% if title %} &rsaquo; {{ title }}{% endif %}
     </div>
-    {% endblock %}
+ {% endblock %}
 
 {% block nav-global %}
 <div style="padding-top:30px">
@@ -27,15 +27,19 @@
         <li role="presentation"><a href="{% url 'admin:beneficiary_beneficiary_change' user.beneficiary_profile.pk %}">{% trans 'Beneficiary settings' %}</a></li>
     {% endif %}
 
-    {% if perms.matcher %}
+    {% if perms.matcher and not user.profile.driver %}
         <li role="presentation"><a href="{% url 'admin:matcher_matched_changelist' %}">{% trans 'Delivery schedule' %}</a></li>
     {% endif %}
 
-    {% if perms.profiles %}
+    {% if perms.profiles and user.organization %}
         <li role="presentation"><a href="{% url 'admin:profiles_organization_change' user.organization.pk %}">{% trans 'Organization' %}</a></li>
+    {% endif %}
+
+    {% if perms.profiles and user.profile %}
         <li role="presentation"><a href="{% url 'admin:profiles_profile_change' user.profile.pk %}">{% trans 'Profile' %}</a></li>
     {% endif %}
-    {% if perms.profiles %}
+
+    {% if perms.matcher and user.profile.driver %}
         <li role="presentation"><a href="{% url 'admin:matcher_visitpoint_changelist' %}">{% trans 'Driver schedule' %}</a></li>
     {% endif %}
 
