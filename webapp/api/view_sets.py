@@ -58,7 +58,6 @@ class BeneficiaryViewSet(viewsets.ModelViewSet):
 router.register(r'beneficiary', BeneficiaryViewSet)
 
 
-
 class TempMatchSimpleViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing user instances.
@@ -85,9 +84,19 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
         self.statusChangeActions()
         serializer.save()
     
-    def sendEmailToBeneficiary(self,beneficiary_id):
-#        Sending email
-        pass
+
+    def sendEmailToBeneficiary(self, beneficiary_id):
+        if beneficiary_id < 0:
+            return
+
+        from django.conf import settings
+        if "pinax.notifications" not in settings.INSTALLED_APPS:
+            return
+        from pinax.notifications import models as notifications
+
+        beny = Beneficiary.objects.filter(id=beneficiary_id)
+        notifications.send([beny.user], "offer_to_beneficiary", {'beneficiary': beny})
+    
 router.register(r'temporal_matching_simple', TempMatchSimpleViewSet)
 
 

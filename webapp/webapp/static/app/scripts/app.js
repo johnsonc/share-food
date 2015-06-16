@@ -183,6 +183,7 @@ app.controller("matching",function($scope,Restangular,$cookies,$interval){
                             "date": item.date,
                             "beneficiary_contact_person": item.beneficiary_contact_person,
                             "quantity": item.quantity,
+                            "hash": item.hash,
                             "status": status, 
                             "offer": item.offer.id,
                             "driver": driver,

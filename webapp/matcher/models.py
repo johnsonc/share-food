@@ -28,12 +28,12 @@ class Routing(models.Model):
 
 class TemporalMatching(models.Model):
     STATUS_OPTS = (
-        (1,_("pending")),
-        (2,_("waiting")),
-        (3,_("confirmed")),
-        (4,_("accepted")),
-        (5,_("assigned")),
-        (6,_("notified"))
+        (1, _("pending")),
+        (2, _("waiting")),
+        (3, _("confirmed")),
+        (4, _("accepted")),
+        (5, _("assigned")),
+        (6, _("notified"))
     )
     
     offer = models.ForeignKey('donor.Offer')
@@ -43,10 +43,18 @@ class TemporalMatching(models.Model):
     quantity = models.FloatField()
     status = models.PositiveSmallIntegerField( max_length=1, choices = STATUS_OPTS )
     driver = models.ForeignKey(Driver, null=True, blank=True, default = None)
-        
+    hash = models.IntegerField(blank=True, null=True)
+
     class Meta:
         verbose_name = _('Temporal match')
         verbose_name_plural = _('Temporal matchings')
+
+    def send_offer(self):
+        self.status = 2
+
+    def offer_accepted(self, hash):
+        if hash == self.hash:
+            self.status = 4
 
 
 class VisitPoint(models.Model):

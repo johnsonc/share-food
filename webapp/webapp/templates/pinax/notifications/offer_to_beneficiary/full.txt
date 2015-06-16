@@ -1,0 +1,10 @@
+{% blocktrans %}
+Hi there,
+
+We've got an offer for you!
+
+Check details on:{% endblocktrans %} http://{{ current_site }}{% url 'confirm_offer' beneficiary.id %}
+{% blocktrans %}
+Cheers,
+
+{% endblocktrans %}

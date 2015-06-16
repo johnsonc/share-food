@@ -4,4 +4,4 @@ pytz
 djangorestframework
 markdown
 django-filter
-pinax-notifications>=2.0.1
+pinax-notifications==2.0.1

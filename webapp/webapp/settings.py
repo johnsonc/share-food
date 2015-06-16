@@ -30,13 +30,14 @@ ALLOWED_HOSTS = []
 # Application definition
 INSTALLED_APPS = (
     
-    'webapp',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'rest_framework',
     # 3rd party
     'pinax.notifications',
@@ -48,7 +49,7 @@ INSTALLED_APPS = (
     'matcher',
     'dictionaries',
     'api',
-    
+    'webapp',   
 )
 
 MIDDLEWARE_CLASSES = (

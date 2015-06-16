@@ -14,9 +14,10 @@ class DeliveriesInline(admin.StackedInline):
 
 
 class BeneficiaryAdmin(admin.ModelAdmin):
-    fieldsets = (
+
+    fieldsets = [
         (_('Basic info'), {
-            'fields': ('num_meals', 'group', 'user')
+            'fields': ('num_meals', 'group',)
         }),
         (_('Storage capacity'), {
             'fields': ('frozen_capacity', 'refrigerated_capacity', 'drystorage_capacity',)
@@ -24,21 +25,23 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         (_('Preferences'), {
             'fields': ('food_category', 'dont_accept', 'accept_meat_issue', 'accept_rel_issue', 'preference_info')
         }),
-    )
+    ]
 
     readonly_fields = ('group',)
+
     inlines = [
         DeliveriesInline
         ]
 
-
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = []
         if not request.user.is_superuser:
-            self.exclude.append('user')
-        #else:
-        #    if self.fieldsets[0][0] == 'Beneficiary':
-        #        self.fieldsets.insert(0, ('Beneficiary', {'fields': ('user',)}))
+            #self.exclude.append('user') #here!
+            if self.fieldsets[0][0] == 'User':
+                self.fieldsets = self.fieldsets[1:]
+        else:
+            if self.fieldsets[0][0] == _('Basic info'):
+                self.fieldsets.insert(0, ('User', {'fields': ('user',)}))
 
         return super(BeneficiaryAdmin, self).get_form(request, obj, **kwargs)
 
@@ -61,7 +64,15 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(user=request.user)
-
+    """
+    def changelist_view(self, request):
+        if not request.user.is_superuser:
+            return redirect(
+                urlresolvers.reverse("admin:auth_user_change", args=(request.user.id,)),
+            )
+        else:
+            return super(UserWithProfileAdmin, self).changelist_view(request)
+    """
 site.register(BeneficiaryGroup)
 site.register(Beneficiary, BeneficiaryAdmin)
 
