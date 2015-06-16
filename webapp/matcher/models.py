@@ -27,20 +27,21 @@ class Routing(models.Model):
 
 
 class TemporalMatching(models.Model):
-
-    STATUS = (
-        ('p', _('Pending')),
-        ('c', _('Confirmed')),
-        ('a', _('Accepted')),
-        ('w', _('Waiting'))
+    STATUS_OPTS = (
+        (1, _("pending")),
+        (2, _("waiting")),
+        (3, _("confirmed")),
+        (4, _("accepted")),
+        (5, _("assigned")),
+        (6, _("notified"))
     )
-
+    
     offer = models.ForeignKey('donor.Offer')
     beneficiary = models.ForeignKey('beneficiary.Beneficiary')
     date = models.DateField()
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
-    status = models.PositiveSmallIntegerField()
+    status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS)
     hash = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -48,12 +49,11 @@ class TemporalMatching(models.Model):
         verbose_name_plural = _('Temporal matchings')
 
     def send_offer(self):
-        self.status = 'w'
-        
+        self.status = 2
 
     def offer_accepted(self, hash):
         if hash == self.hash:
-            self.status = 'c'
+            self.status = 4
 
 
 class VisitPoint(models.Model):

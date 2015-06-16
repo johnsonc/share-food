@@ -1,0 +1,240 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_static %}
+
+{% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">
+{% trans "Home" %}</a> > {% trans "Matcher"%}</div>{% endblock %}
+
+{% block extrastyle %}
+<link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
+<link rel="stylesheet" href="/static/app/styles/matching.css">
+{% endblock %}
+
+{% block extrahead %}
+<script type="text/javascript" src="/jsi18n/"></script> 
+<script type="text/javascript" src="/static/admin/js/core.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/RelatedObjectLookups.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.js"></script>
+<script type="text/javascript" src="/static/admin/js/jquery.init.js"></script>
+<script type="text/javascript" src="/static/admin/js/actions.js"></script>
+<script type="text/javascript" src="/static/admin/js/related-widget-wrapper.js"></script>
+<script type="text/javascript" src="/static/admin/js/calendar.js"></script>
+<script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+{% endblock %}
+{% block bodyclass %}angular" ng-app="angApp{% endblock %}
+{% block content %}
+        {% block object-tools %}{% endblock %}
+        {{ content }}
+        <h1>{% trans "Matcher"%}</h1>
+        
+        <div id="content-main" ng-controller="matching">
+            <fieldset class="module aligned">
+                <div class="form-row field-date">
+                    <div>
+                        <label class="required" for="id_date">{% trans "Date:"%}</label>
+                        <input class="vDateField" id="id_date" 
+                               name="date" size="10" type="text" 
+                               ng-model="incomedate"  
+                               ng-change="getList(incomedate)"
+                               >
+                    </div>
+                </div>
+                <div class="form-row field-date">
+                    <div>
+                        <label class="required" for="id_date">{% trans "Mass unit:"%}</label>
+                        <div class="mass_unit" ng-model="form">
+                            <label class="radio">
+                              <input type="radio" name="iROptions" id="inlineRadio1" value="kg" ng-model="form.mass_unit" > {% trans "kg"%}
+                            </label>
+                            <label class="radio">
+                              <input type="radio" name="iROptions" id="inlineRadio2" value="pounds" ng-model="form.mass_unit"> {% trans "pounds"%}
+                            </label>
+                            [[form]]
+                        </div>
+                    </div>
+                </div>
+            
+            
+                <div class="form-row field-meat_issue field-rel_issue">
+                    <div class="field-box field-meat_issue">
+                        <label class="required" for="">{% trans "Donors:"%}</label>
+                        <div class="related-widget-wrapper">
+                            <table class="table table-hover">
+                              <thead>
+                                  <tr>
+                                      <th>{% trans "ID"%}</th>
+                                      <th>{% trans "Donnor"%}</th>
+                                      <th>{% trans "Accepted[%]"%}</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);">
+                                      <th>[[item.offer.id]]</th>
+                                      <th>[[item.offer.name]]</th>
+                                      <th>?????</th>
+                                  </tr>
+                              </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="field-box field-rel_issue">
+                        <label class="required inline" for="">{% trans "Beneficiary:"%}</label>
+                        <div class="related-widget-wrapper">
+                            <div class="box" ng-model="select">
+                                <label class="radio-inline">
+                                {% trans "Select:"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value="1"> {% trans "pending"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio2" ng-model="select.status" value="2"> {% trans "waiting"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio3" ng-model="select.status" value="3"> {% trans "confirmed"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio4" ng-model="select.status" value="4"> {% trans "accepted"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio5" ng-model="select.status" value="5"> {% trans "assigned"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio6" ng-model="select.status" value="6"> {% trans "notified"%}
+                                </label>
+                            </div>
+                            <div class="box">
+                                <table class="table table-hover" ng-model="sum">
+                                  <thead>
+                                      <tr>
+                                          <th>#</th>
+                                          <th>{% trans "ID"%}</th>
+                                          <th>{% trans "Bebeficiary"%}</th>
+                                          <th>{% trans "Status"%}</th>
+                                          <th>{% trans "Num Meals"%}</th>
+                                          <th>{% trans "Quantity"%}</th>
+                                          <th>{% trans "Last delivery [days]"%}</th>
+                                          <th>{% trans "Distance [miles]"%}</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr ng-repeat="item in (filtItems=(items | filter:select:false ))" ng-click="viewBenInInfoBox(item.beneficiary)">
+                                          <th><input type="checkbox" name="TabOptions" id="1" ng-model="item.beneficiary.checked"></th>
+                                          <th>[[item.beneficiary.id]]</th>
+                                          <th>[[item.beneficiary.group.name]]</th>
+                                          <th>[[item.status_maped]]</th>
+                                          <th>[[item.beneficiary.num_meals]]</th>
+                                          <th>[[item.quantity]]</th>
+                                          <th>[[item.beneficiary.last_delivery]]</th>
+                                          <th>??????</th>
+                                      </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box">
+                                <div>
+                                   <label class="radio-inline">
+                                    {% trans "Sum:"%} [[sumOf(filtItems)]]
+                                   </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </fieldset>
+                <fieldset class="module aligned half-box">
+                    <h2>{% trans "Donor:"%}</h2>
+                    <div class="form-row field-meat_issue field-rel_issue">
+                        <div class="field-box field-meat_issue">
+<!--                            <label class="required" for="">Donor:</label>-->
+                            <div class="info_box">
+                                <h1>[[viewDonor.name]]</h1>
+                                <div>{% trans "Delivery name:"%} [[viewDonor.name]]</div>
+                                <div>{% trans "Beneficiary groups:"%} [[viewDonor.beneficiary_group.name]]</div>
+                                <div>{% trans "Food category:"%} [[viewDonor.food_category]]</div>
+                                <div>{% trans "Estimated mass:"%} [[viewDonor.estimated_mass]]</div>
+                                <div>{% trans "Temperature:"%} [[viewDonor.temperature]]</div>
+                                <div>{% trans "Packaging:"%} [[viewDonor.packaging]]</div>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="module aligned  half-box">
+                    <h2>{% trans "Beneficiary"%}</h2>
+                    <div class="field-box field-meat_issue">
+<!--                            <label class="required" for="">Beneficiary:</label>-->
+                        <div class="info_box">
+                            <h1>[[viewBen.group.name]]</h1>
+                            <div>{% trans "Belongs to:"%} [[viewBen.group.name]]</div>
+                            <div>{% trans "Current storage capacity:"%}?????</div>
+                            <ul>
+                                <li>{% trans "frozen:"%} [[viewBen.frozen_capacity]]</li>
+                                <li>{% trans "refrigerated:"%} [[viewBen.refrigerated_capacity]]</li>
+                                <li>{% trans "dry storage:"%} [[viewBen.drystorage_capacity]]</li>
+                            </ul>
+                            <div class="info_box">
+                                [[ viewBen.preference_info ]]
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <fieldset style="width:100%;" class="module aligned">
+                    <h2>{% trans "Actions:"%}</h2>
+                     {% csrf_token %}
+                      <button type="button" class="btn btn-default" 
+                          ng-click="sendOffer(items)">{% trans "Send Offer"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="accept(items)">{% trans "Accept"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="assignDriver(items)">{% trans "Assign driver"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="notify(items)">{% trans "Notify"%}</button>
+                      <button type="button" class="btn btn-default" 
+                          ng-click="cancel(items)">{% trans "Cancel"%}</button>
+                </fieldset>
+                
+                                
+<script type="text/javascript">
+        (function($) {
+            $(document).ready(function() {
+                $('.add-another').click(function(e) {
+                    e.preventDefault();
+                    showAddAnotherPopup(this);
+                });
+                $('.related-lookup').click(function(e) {
+                    e.preventDefault();
+                    showRelatedObjectLookupPopup(this);
+                });
+            
+                $('form#temporalmatching_form :input:visible:enabled:first').focus()
+            
+            });
+        })(django.jQuery);
+    </script>
+    <script type="text/javascript">
+        (function($) {
+            var field;
+
+
+        })(django.jQuery);
+    </script>
+    <script src="/static/bower_components/lodash/lodash.js"></script>
+    <script src="/static/bower_components/angular/angular.js"></script>
+    <script src="/static/bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="/static/bower_components/restangular/dist/restangular.js"></script>
+    <script src="/static/bower_components/restangular/dist/restangular.min.js"></script>
+    <script src="/static/app/scripts/app.js"></script>
+<div class="calendarbox module" id="calendarbox0" style="display: none; position: absolute; left: 284px; top: 143px;">
+       <div>
+           <a href="javascript:DateTimeShortcuts.drawPrev(0);" class="calendarnav-previous">&lt;</a>
+           <a href="javascript:DateTimeShortcuts.drawNext(0);" class="calendarnav-next">&gt;</a>
+       </div>
+       <div id="calendarin0" class="calendar">
+           <table><caption>May 2015</caption>
+           <tbody><tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr><tr>
+           <td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> 
+           </td><td class="nonday"> </td><td class="">
+           <a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,1));">1</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,2));">2</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,3));">3</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,4));">4</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,5));">5</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,6));">6</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,7));">7</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,8));">8</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,9));">9</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,10));">10</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,11));">11</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,12));">12</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,13));">13</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,14));">14</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,15));">15</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,16));">16</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,17));">17</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,18));">18</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,19));">19</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,20));">20</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,21));">21</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,22));">22</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,23));">23</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,24));">24</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,25));">25</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,26));">26</a></td><td class="today"><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,27));">27</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,28));">28</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,29));">29</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,30));">30</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,31));">31</a></td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td></tr></tbody></table></div><div class="calendar-shortcuts"><a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, -1);">Yesterday</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, 0);">Today</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, +1);">Tomorrow</a></div><p class="calendar-cancel"><a href="javascript:DateTimeShortcuts.dismissCalendar(0);">Cancel</a></p></div>    
+        
+        
+{% endblock %}

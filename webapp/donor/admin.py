@@ -3,6 +3,7 @@ from panel.admin import site
 from django.utils.translation import ugettext as _
 
 from .models import OfferRepetition, Offer#, Donnor
+from django.contrib.auth.models import User
 
 
 class RepetitionInline(admin.StackedInline):
@@ -58,6 +59,7 @@ class OfferAdmin(admin.ModelAdmin):
         return super(OfferAdmin, self).get_form(request, obj, **kwargs)
 
     def save_model(self, request, obj, form, change):
+        obj.donor = User.objects.get(id=1)
         if not request.user.is_superuser:
             obj.donor = request.user
         obj.save()
