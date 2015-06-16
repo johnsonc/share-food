@@ -1,6 +1,5 @@
 {% extends "admin/base_site.html" %}
 {% load i18n admin_static %}
-{% load admin_urls %}
 
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
 
@@ -8,9 +7,7 @@
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
-{% block breadcrumbs %} {{ block.super }} {% endblock %}
-{% block pretitle %} {{ block.super }} {% endblock %}
-
+{% block breadcrumbs %}{% endblock %}
 
 {% block content %}
 <div id="content-main">
@@ -54,6 +51,14 @@
 
 {% block sidebar %}
 <div id="content-related">
+    <div class="module">
+      <h2>Admin tools</h2>
+        <ul class="actionlist">
+          <li class="changelink">
+            <a href="/admin/matcher_panel/">Matcher</a>
+          </li>
+        </ul>
+    </div>
     <div class="module" id="recent-actions-module">
         <h2>{% trans 'Recent Actions' %}</h2>
         <h3>{% trans 'My Actions' %}</h3>
@@ -72,7 +77,7 @@
                 {% endif %}
                 <br/>
                 {% if entry.content_type %}
-                    <span class="mini quiet">{% filter capfirst %}{% trans entry.content_type.name %}{% endfilter %}</span>
+                    <span class="mini quiet">{% filter capfirst %}{{ entry.content_type }}{% endfilter %}</span>
                 {% else %}
                     <span class="mini quiet">{% trans 'Unknown content' %}</span>
                 {% endif %}

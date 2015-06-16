@@ -59,16 +59,29 @@ class Profile(models.Model):
     def __unicode__(self):
         return '%s profile' % self.user.username
 
-"""
-class Dictionary(models.Model):
-    upper_dic_id = models.PositiveIntegerField()
-    item_id = models.PositiveIntegerField()
-    item_name = models.CharField(max_length=255)
 
-    class Meta:
-        verbose_name = _('Dictionary')
-        verbose_name_plural = _('Dictionaries')
+def create_defaults(sender, instance, created, raw, using, update_fields, **kwargs):
+    from django.contrib.gis.geos import Point
 
-    def __unicode__(self):
-        return self.item_name
-"""
+    if created:
+        p = Profile(user=instance,
+                    address="",
+                    tel_1="",
+                    tel_2="",
+                    default_mass_unit='kg',
+                    location=Point(-101.185547, 56.536854))
+        p.save()
+
+        o = Organization(name=Organization.DEFAULT_ORGANIZATION_NAME,
+                            address='',
+                            first_name='',
+                            last_name='',
+                            tel_1='',
+                            tel_2='',
+                            email='',
+                            default_mass_unit='',
+                            location=Point(-101.185547, 56.536854),
+                            user=instance)
+        o.save()
+
+post_save.connect(create_defaults, sender=User)
