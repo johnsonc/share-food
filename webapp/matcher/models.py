@@ -42,7 +42,8 @@ class TemporalMatching(models.Model):
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
     status = models.PositiveSmallIntegerField( max_length=1, choices = STATUS_OPTS )
-
+    driver = models.ForeignKey(Driver, null=True, blank=True, default = None)
+        
     class Meta:
         verbose_name = _('Temporal match')
         verbose_name_plural = _('Temporal matchings')

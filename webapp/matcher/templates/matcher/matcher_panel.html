@@ -38,6 +38,7 @@
                                >
                     </div>
                 </div>
+<!--
                 <div class="form-row field-date">
                     <div>
                         <label class="required" for="id_date">{% trans "Mass unit:"%}</label>
@@ -52,10 +53,11 @@
                         </div>
                     </div>
                 </div>
+-->
             
             
                 <div class="form-row field-meat_issue field-rel_issue">
-                    <div class="field-box field-meat_issue">
+                    <div class="field-box field-meat_issue all_page">
                         <label class="required" for="">{% trans "Donors:"%}</label>
                         <div class="related-widget-wrapper">
                             <table class="table table-hover">
@@ -67,21 +69,25 @@
                                   </tr>
                               </thead>
                               <tbody>
+                                  
                                   <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);">
                                       <th>[[item.offer.id]]</th>
                                       <th>[[item.offer.name]]</th>
-                                      <th>?????</th>
+                                      <th>[[percentage(item.offer) | number:2]]%</th>
                                   </tr>
                               </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="field-box field-rel_issue">
+                    <div class="field-box field-rel_issue all_page">
                         <label class="required inline" for="">{% trans "Beneficiary:"%}</label>
                         <div class="related-widget-wrapper">
                             <div class="box" ng-model="select">
                                 <label class="radio-inline">
                                 {% trans "Select:"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value=""> {% trans "all"%}
                                 </label>
                                 <label class="radio-inline">
                                   <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value="1"> {% trans "pending"%}
@@ -113,19 +119,21 @@
                                           <th>{% trans "Num Meals"%}</th>
                                           <th>{% trans "Quantity"%}</th>
                                           <th>{% trans "Last delivery [days]"%}</th>
-                                          <th>{% trans "Distance [miles]"%}</th>
+<!--                                          <th>{% trans "Distance [miles]"%}</th>-->
                                       </tr>
                                   </thead>
                                   <tbody>
                                       <tr ng-repeat="item in (filtItems=(items | filter:select:false ))" ng-click="viewBenInInfoBox(item.beneficiary)">
-                                          <th><input type="checkbox" name="TabOptions" id="1" ng-model="item.beneficiary.checked"></th>
+                                          <th><input type="checkbox" name="TabOptions" id="1" 
+                                                  ng-model="item.beneficiary.checked" 
+                                                  ng-change="beneficiaryChanged(items)"></th>
                                           <th>[[item.beneficiary.id]]</th>
                                           <th>[[item.beneficiary.group.name]]</th>
                                           <th>[[item.status_maped]]</th>
                                           <th>[[item.beneficiary.num_meals]]</th>
                                           <th>[[item.quantity]]</th>
                                           <th>[[item.beneficiary.last_delivery]]</th>
-                                          <th>??????</th>
+<!--                                          <th>??????</th>-->
                                       </tr>
                                     </tbody>
                                 </table>
@@ -141,56 +149,85 @@
                     </div>
                 </div>
                 </fieldset>
-                <fieldset class="module aligned half-box">
-                    <h2>{% trans "Donor:"%}</h2>
+                <fieldset class="module aligned all_page">
+                    <h2>{% trans "Drivers:"%}</h2>
                     <div class="form-row field-meat_issue field-rel_issue">
+                        <div class="field-box field-meat_issue all_page">
+                            <div class="related-widget-wrapper">
+                                <table class="table table-hover">
+                                  <thead>
+                                      <tr>
+                                          <th>#</th>
+                                          <th>{% trans "ID"%}</th>
+                                          <th>{% trans "Driver Name"%}</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody >
+
+                                      <tr ng-repeat="item in drivers">
+                                          <th><input type="radio" name="driver" 
+                                                  ng-model="$parent.picked" 
+                                                  ng-change="beneficiaryChanged(items)" value="[[item.id]]"></th>
+                                          <th>[[item.id]]</th>
+                                          <th>[[item.user.username]]  [[radioselect.picked]]</th>
+                                      </tr>
+                                      
+                                  </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="all_page">
+                    <fieldset class="module aligned half-box">
+                        <h2>{% trans "Donor:"%}</h2>
+                        <div class="form-row field-meat_issue field-rel_issue">
+                            <div class="field-box field-meat_issue">
+                                <div class="info_box">
+                                    <h1>[[viewDonor.name]]</h1>
+                                    <div>{% trans "Delivery name:"%} [[viewDonor.name]]</div>
+                                    <div>{% trans "Beneficiary groups:"%} [[viewDonor.beneficiary_group.name]]</div>
+                                    <div>{% trans "Food category:"%} [[viewDonor.food_category]]</div>
+                                    <div>{% trans "Estimated mass:"%} [[viewDonor.estimated_mass]]</div>
+                                    <div>{% trans "Temperature:"%} [[viewDonor.temperature]]</div>
+                                    <div>{% trans "Packaging:"%} [[viewDonor.packaging]]</div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="module aligned  half-box">
+                        <h2>{% trans "Beneficiary"%}</h2>
                         <div class="field-box field-meat_issue">
-<!--                            <label class="required" for="">Donor:</label>-->
                             <div class="info_box">
-                                <h1>[[viewDonor.name]]</h1>
-                                <div>{% trans "Delivery name:"%} [[viewDonor.name]]</div>
-                                <div>{% trans "Beneficiary groups:"%} [[viewDonor.beneficiary_group.name]]</div>
-                                <div>{% trans "Food category:"%} [[viewDonor.food_category]]</div>
-                                <div>{% trans "Estimated mass:"%} [[viewDonor.estimated_mass]]</div>
-                                <div>{% trans "Temperature:"%} [[viewDonor.temperature]]</div>
-                                <div>{% trans "Packaging:"%} [[viewDonor.packaging]]</div>
+                                <h1>[[viewBen.group.name]]</h1>
+                                <div>{% trans "Belongs to:"%} [[viewBen.group.name]]</div>
+                                <div>{% trans "Current storage capacity:"%} ?????</div>
+                                <ul>
+                                    <li>{% trans "frozen:"%} [[viewBen.frozen_capacity]]</li>
+                                    <li>{% trans "refrigerated:"%} [[viewBen.refrigerated_capacity]]</li>
+                                    <li>{% trans "dry storage:"%} [[viewBen.drystorage_capacity]]</li>
+                                </ul>
+                                <div class="info_box">
+                                    [[ viewBen.preference_info ]]
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </fieldset>
-                <fieldset class="module aligned  half-box">
-                    <h2>{% trans "Beneficiary"%}</h2>
-                    <div class="field-box field-meat_issue">
-<!--                            <label class="required" for="">Beneficiary:</label>-->
-                        <div class="info_box">
-                            <h1>[[viewBen.group.name]]</h1>
-                            <div>{% trans "Belongs to:"%} [[viewBen.group.name]]</div>
-                            <div>{% trans "Current storage capacity:"%}?????</div>
-                            <ul>
-                                <li>{% trans "frozen:"%} [[viewBen.frozen_capacity]]</li>
-                                <li>{% trans "refrigerated:"%} [[viewBen.refrigerated_capacity]]</li>
-                                <li>{% trans "dry storage:"%} [[viewBen.drystorage_capacity]]</li>
-                            </ul>
-                            <div class="info_box">
-                                [[ viewBen.preference_info ]]
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-                
-                <fieldset style="width:100%;" class="module aligned">
+                    </fieldset>
+                </div>
+                <br>
+                <fieldset class="module aligned all_page">
                     <h2>{% trans "Actions:"%}</h2>
                      {% csrf_token %}
                       <button type="button" class="btn btn-default" 
-                          ng-click="sendOffer(items)">{% trans "Send Offer"%}</button>
+                          ng-click="sendOffer(items)" ng-disabled="sendOfferChecked">{% trans "Send Offer"%}</button>
                       <button type="button" class="btn btn-default" 
-                          ng-click="accept(items)">{% trans "Accept"%}</button>
+                          ng-click="accept(items)" ng-disabled="acceptChecked">{% trans "Accept"%}</button>
                       <button type="button" class="btn btn-default" 
-                          ng-click="assignDriver(items)">{% trans "Assign driver"%}</button>
+                          ng-click="assignDriver(items)" ng-disabled="assignDriverChecked">{% trans "Assign driver"%}</button>
                       <button type="button" class="btn btn-default" 
-                          ng-click="notify(items)">{% trans "Notify"%}</button>
+                          ng-click="notify(items)" ng-disabled="notifyChecked">{% trans "Notify"%}</button>
                       <button type="button" class="btn btn-default" 
-                          ng-click="cancel(items)">{% trans "Cancel"%}</button>
+                          ng-click="cancel(items)" ng-disabled="cancelChecked">{% trans "Cancel"%}</button>
                 </fieldset>
                 
                                 

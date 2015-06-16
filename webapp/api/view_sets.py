@@ -1,12 +1,12 @@
 from rest_framework import viewsets
 from api.serializer import OfferSerializer, TemporalMatchingSerializer, BeneficiarySimpleSerializer,\
-                            TemporalMatchingSimpleSerializer
+                            TemporalMatchingSimpleSerializer, DriverSerializer
 
 from rest_framework import routers
 
 #models
 from donor.models import Offer
-from matcher.models import TemporalMatching
+from matcher.models import TemporalMatching, Driver
 from beneficiary.models import Beneficiary
 
 import datetime
@@ -88,9 +88,15 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
     def sendEmailToBeneficiary(self,beneficiary_id):
 #        Sending email
         pass
-    
-    
 router.register(r'temporal_matching_simple', TempMatchSimpleViewSet)
 
+
+class DriverViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing user instances.
+    """
+    serializer_class = DriverSerializer
+    queryset = Driver.objects.all()
+router.register(r'drivers', DriverViewSet)
 
 
