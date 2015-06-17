@@ -50,6 +50,8 @@ class Profile(models.Model):
     default_mass_unit = models.CharField(max_length=5, choices=MASS_UNITS, default='kg') #Changed from positive integer
     location = models.PointField(blank=True, null=True)
     driver = models.BooleanField(default=False)
+    operator = models.BooleanField(default=False)
+
     objects = models.GeoManager()
 
     class Meta:
