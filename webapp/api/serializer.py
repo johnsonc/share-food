@@ -1,7 +1,15 @@
 from rest_framework import serializers
 from donor.models import Offer, Donor
 from beneficiary.models import Beneficiary, BeneficiaryGroup
-from matcher.models import TemporalMatching
+from matcher.models import TemporalMatching, Driver
+from django.contrib.auth.models import User
+
+
+class UserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ('username',)
 
 
 class OfferSerializer(serializers.ModelSerializer):
@@ -13,6 +21,7 @@ class DonorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Donor
 
+        
 class BeneficiaryGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = BeneficiaryGroup
@@ -34,7 +43,8 @@ class TemporalMatchingSerializer(serializers.ModelSerializer):
         model = TemporalMatching
         depth = 2
         fields = ('id', 'offer' ,'beneficiary', 'status', 'quantity','date','beneficiary_contact_person')
-        
+   
+
 class TemporalMatchingSimpleSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -45,4 +55,13 @@ class BeneficiarySimpleSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Beneficiary
+   
+
+class DriverSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    
+    class Meta:
+        model = Driver
+        fields = ('id', 'user')
+        
         

@@ -1,4 +1,8 @@
 .half-box {
-    width: 49%;
+    width: 50%;
     float:left;
+}
+
+. all_page{
+    width: 100%;
 }

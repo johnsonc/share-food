@@ -31,7 +31,7 @@ app.filter('uniqueOffer', function() {
    };
 });
 
-app.controller("matching",function($scope,Restangular,$cookies){
+app.controller("matching",function($scope,Restangular,$cookies,$interval){
     
     var mapping = [];
     mapping['1'] = "pending";
@@ -40,6 +40,36 @@ app.controller("matching",function($scope,Restangular,$cookies){
     mapping['4'] = "accepted";
     mapping['5'] = "assigned";
     mapping['6'] = "notified";
+    
+    $scope.sendOfferChecked     = true;
+    $scope.acceptChecked        = true;
+    $scope.assignDriverChecked  = true;
+    $scope.notifyChecked        = true;
+    $scope.cancelChecked        = true;
+    $scope.select = {};
+    
+    Restangular.all('drivers').getList()
+        .then(function(drivers){
+            console.log(drivers);
+            $scope.drivers = drivers;
+    });
+    
+//    var timer = $interval( function(){
+//        if($scope.incomedate){
+//            Restangular.all('temporal_matching')
+//                .customGET("",{'date':""+$scope.incomedate})
+//                .then(function(items){
+//                    angular.forEach(items,function(item){
+//                        item.status_maped = mapping[item.status];
+//                    });
+//                $scope.items = items;
+//            });
+//        }
+//    }, 10000);
+    
+    $scope.$on('$destroy', function() {
+          $interval.cancel(timer);
+        });
     
     $scope.$watch(
         function($scope){return $scope.incomedate},
@@ -50,7 +80,6 @@ app.controller("matching",function($scope,Restangular,$cookies){
     
     $scope.getList = function(in_date){
         var temp_matching = Restangular.all('temporal_matching');
-        
         temp_matching.customGET("",{'date':""+in_date}).then(function(items){
                 angular.forEach(items,function(item){
                     item.status_maped = mapping[item.status];
@@ -58,7 +87,9 @@ app.controller("matching",function($scope,Restangular,$cookies){
                 $scope.items = items;
             });
     }
+    
     $scope.viewDonorInInfoBox = function(item){
+        $scope.select.offer = {id:item.id};
         $scope.viewDonor = item;
     }
     $scope.viewBenInInfoBox = function(item){
@@ -66,18 +97,96 @@ app.controller("matching",function($scope,Restangular,$cookies){
     }
     
     $scope.sendOffer = function(items){
-//       operator klika „Send offer” i do zaznaczonych beneficjentów wysyłany jest mail z propozycją przyjęcia dotacji, 
-//	     status beneficjenta zmienia się z „pending” na „waiting".
-        
         angular.forEach(items, function(item){
-            item.status = 2;
-            if(item.beneficiary.checked && item.beneficiary.checked == true){
+            $scope.changeStatus(item,2,null);
+        });
+    }
+    
+    $scope.accept = function(items){
+        angular.forEach(items, function(item){
+            $scope.changeStatus(item,4,$scope.picked);
+        });
+    }
+    
+    $scope.assignDriver = function(items){
+        angular.forEach(items, function(item){
+            $scope.changeStatus(item,5,item.driver);
+        });
+    }
+    
+    $scope.notify = function(items){
+        angular.forEach(items, function(item){
+            $scope.changeStatus(item,6,item.driver);
+        });
+    }
+    
+    $scope.cancel = function(items){
+         angular.forEach(items, function(item){
+            $scope.changeStatus(item,1,null);
+         });
+    }
+    
+    $scope.sumOf = function(items){
+        if(items!=undefined)
+            return items.reduce( function(total, item){
+                  return total + item.quantity
+                }, 0);
+        else
+            return 0;
+    }
+    
+    $scope.beneficiaryChanged = function(items){
+        $scope.sendOfferChecked = false;
+        $scope.acceptChecked  = false;
+        $scope.assignDriverChecked  = false;
+        $scope.notifyChecked  = false;
+        $scope.cancelChecked  = false;
+        angular.forEach(items,function(item){
+            if(item.beneficiary.checked){
+                if( item.status != 1 ){
+                    $scope.sendOfferChecked = true;
+                }
+                if( item.status != 3 ){
+                    $scope.acceptChecked = true;
+                }
+                if( item.status != 4 ){
+                    $scope.assignDriverChecked = true;
+                }
+                if($scope.picked==undefined){
+                    $scope.assignDriverChecked = true;
+                }
+                if( item.status != 5 ){
+                    $scope.notifyChecked = true;
+                }
+                if( item.status != 6 ){
+                    $scope.cancelChecked = true;
+                }
+            }
+        });
+    }
+    
+    $scope.percentage = function(offer){
+        var temp = 0;
+        angular.forEach($scope.items, function(item){
+            if(item.offer.id == offer.id && item.status>=3 ){
+                temp += item.quantity
+            }
+        });
+        var calculation = (temp/offer.estimated_mass) * 100;
+        return  calculation;
+    }
+    
+    $scope.changeStatus = function(item,status,driver){
+    
+        if(item.beneficiary.checked && item.beneficiary.checked == true){
                 var temp = {"id": item.id,
                             "date": item.date,
                             "beneficiary_contact_person": item.beneficiary_contact_person,
                             "quantity": item.quantity,
-                            "status": 2, //<-- status changed
+                            "hash": item.hash,
+                            "status": status, 
                             "offer": item.offer.id,
+                            "driver": driver,
                             "beneficiary": item.beneficiary.id}
                 
                 Restangular.setDefaultHeaders({"X-CSRFToken": $cookies.get('csrftoken')})
@@ -85,53 +194,8 @@ app.controller("matching",function($scope,Restangular,$cookies){
                     .then(function(resp){
                     });
             }
-        });
-        $scope.getList($scope.incomedate);
-    }
-    
-    $scope.accept = function(items){
-        console.log("accept");
-    }
-    
-    $scope.assignDriver = function(items){
-        console.log("assignDriver");
-    }
-    
-    $scope.notify = function(items){
-        console.log("notify");
-    }
-    
-    $scope.cancel = function(items){
-        console.log("cancel");
-    }
-    
-    $scope.sumOf = function(items){
-        if(items!=undefined)
-            return items.reduce( function(total, item){
-                  return total + item.beneficiary.num_meals
-                }, 0);
-        else
-            return 0;
     }
 });
 
-angular.module('angApp.directives')
-    .directive('st', function() {
-      return {
-        restrict: 'E',
-        replace: true,
-        scope: {
-          stat: '='
-        },
-        link: function(scope, element, attrs) {
-            attrs.$observe('stat', function(st) {
-                scope.status = st.status;
-                console.log(st);
-            });
-            
-        },
-        template: '<th>[[status]]</th>'
-      };
-});
 
 
