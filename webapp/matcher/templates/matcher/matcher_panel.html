@@ -30,7 +30,7 @@
 <script src="/static/bower_components/angular/angular.js"></script>
 <script src="/static/bower_components/leaflet/dist/leaflet.js"></script>
 <script src="/static/js/leaflet.awesome-markers.js"></script>
-<script src="/static/js/dist/angular-leaflet-directive.min.js"</script>
+<script src="/static/js/angular-leaflet-directive.min.js"</script>
 <script src="/static/bower_components/angular-route/angular-route.js"></script>
 <script src="/static/bower_components/restangular/dist/restangular.js"></script>
 <script src="/static/bower_components/angular-cookies/angular-cookies.js"></script>
@@ -157,7 +157,10 @@
                                           <th>[[item.beneficiary.group.name]]</th>
                                           <th>[[item.status_maped]]</th>
                                           <th>[[item.beneficiary.num_meals]]</th>
-                                          <th>[[item.quantity]]</th>
+                                          <th ng-init="qanti=true"><span ng-show="qanti" ng-click="qanti=!qanti">[[item.quantity]]</span> 
+                                              <span ng-hide="qanti"><input type="text" ng-model="item.quantity" ng-value="item.quantity" >
+                                              <button ng-click="saveQuantity(item);qanti=!qanti;">ok</button></span>
+                                          </th>
                                           <th>[[item.beneficiary.last_delivery]]</th>
 <!--                                          <th>??????</th>-->
                                       </tr>

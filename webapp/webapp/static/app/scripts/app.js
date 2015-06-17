@@ -95,6 +95,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
             });
     }
     
+    
     $scope.map = function(items){
         $scope.mapopened = !$scope.mapopened;
         var map_ben = [];
@@ -269,6 +270,26 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                 });
             }
     }
+    
+    $scope.saveQuantity = function(item){
+        var temp = {
+            "id": item.id,
+            "date": item.date,
+            "beneficiary_contact_person": item.beneficiary_contact_person,
+            "quantity": item.quantity,
+            "hash": item.hash,
+            "status": item.status, 
+            "offer": item.offer.id,
+            "driver": item.driver,
+            "beneficiary": item.beneficiary.id}
+                
+        Restangular.setDefaultHeaders({"X-CSRFToken": $cookies.get('csrftoken')})
+            .one("temporal_matching_simple",item.id).customPUT(temp)
+            .then(function(resp){
+            });
+    }
+    
+    
 }]);
 
 
