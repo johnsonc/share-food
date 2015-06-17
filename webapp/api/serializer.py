@@ -3,6 +3,12 @@ from donor.models import Offer, Donor
 from beneficiary.models import Beneficiary, BeneficiaryGroup
 from matcher.models import TemporalMatching, Driver
 from django.contrib.auth.models import User
+from profiles.models import Organization
+
+class OrganizationSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Organization
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -32,7 +38,7 @@ class BeneficiarySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Beneficiary
-        fields = ('id', 'group' ,'num_meals', 'frozen_capacity', 'drystorage_capacity', 'refrigerated_capacity', 'preference_info', 'last_delivery')
+        fields = ('id', 'group' ,'num_meals', 'frozen_capacity', 'drystorage_capacity', 'refrigerated_capacity', 'preference_info', 'last_delivery', 'user')
         
 
 class TemporalMatchingSerializer(serializers.ModelSerializer):
