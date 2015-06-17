@@ -38,6 +38,7 @@
                                >
                     </div>
                 </div>
+            </fieldset>
 <!--
                 <div class="form-row field-date">
                     <div>
@@ -55,36 +56,41 @@
                 </div>
 -->
             
-            
-                <div class="form-row field-meat_issue field-rel_issue">
-                    <div class="field-box field-meat_issue all_page">
-                        <label class="required" for="">{% trans "Donors:"%}</label>
-                        <div class="related-widget-wrapper">
-                            <table class="table table-hover">
-                              <thead>
-                                  <tr>
-                                      <th>{% trans "ID"%}</th>
-                                      <th>{% trans "Donnor"%}</th>
-                                      <th>{% trans "Accepted[%]"%}</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  
-                                  <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);">
-                                      <th>[[item.offer.id]]</th>
-                                      <th>[[item.offer.name]]</th>
-                                      <th>[[percentage(item.offer) | number:2]]%</th>
-                                  </tr>
-                              </tbody>
-                            </table>
+                <fieldset class="module aligned all_page">
+                    <h2>{% trans "Donors:"%}</h2>            
+                    <div class="form-row field-meat_issue field-rel_issue">
+                        <div class="field-box field-meat_issue">
+                            <label class="required" for=""></label>
+                            <div class="related-widget-wrapper">
+                                <table class="table table-hover">
+                                  <thead>
+                                      <tr>
+                                          <th>{% trans "ID"%}</th>
+                                          <th>{% trans "Donnor"%}</th>
+                                          <th>{% trans "Accepted[%]"%}</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+
+                                      <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);">
+                                          <th>[[item.offer.id]]</th>
+                                          <th>[[item.offer.name]]</th>
+                                          <th>[[percentage(item.offer) | number:2]]%</th>
+                                      </tr>
+                                  </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <div class="field-box field-rel_issue all_page">
-                        <label class="required inline" for="">{% trans "Beneficiary:"%}</label>
-                        <div class="related-widget-wrapper">
-                            <div class="box" ng-model="select">
+                </fieldset>
+                <fieldset class="module aligned all_page">
+                    <h2>{% trans "Beneficiary:"%}</h2> 
+                    <div class="box_m">
+                        <label class="required inline" for="">{% trans "Select:"%}</label>
+                        <div>
+                            <div class="box radio_select" ng-model="select">
                                 <label class="radio-inline">
-                                {% trans "Select:"%}
+                                
                                 </label>
                                 <label class="radio-inline">
                                   <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value=""> {% trans "all"%}
@@ -108,6 +114,12 @@
                                   <input type="radio" name="Options" id="inlineRadio6" ng-model="select.status" value="6"> {% trans "notified"%}
                                 </label>
                             </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="box_m">
+                        <label class="required inline" for="">{% trans "Beneficiary:"%}</label>
+                        <div>
                             <div class="box">
                                 <table class="table table-hover" ng-model="sum">
                                   <thead>
@@ -146,13 +158,13 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    
                 </div>
                 </fieldset>
                 <fieldset class="module aligned all_page">
                     <h2>{% trans "Drivers:"%}</h2>
                     <div class="form-row field-meat_issue field-rel_issue">
-                        <div class="field-box field-meat_issue all_page">
+                        <div class="field-box field-meat_issue">
                             <div class="related-widget-wrapper">
                                 <table class="table table-hover">
                                   <thead>
@@ -197,7 +209,7 @@
                     </fieldset>
                     <fieldset class="module aligned  half-box">
                         <h2>{% trans "Beneficiary"%}</h2>
-                        <div class="field-box field-meat_issue">
+                        <div class="form-row field-meat_issue field-rel_issue">
                             <div class="info_box">
                                 <h1>[[viewBen.group.name]]</h1>
                                 <div>{% trans "Belongs to:"%} [[viewBen.group.name]]</div>

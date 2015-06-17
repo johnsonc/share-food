@@ -42,7 +42,7 @@
     {% if perms.matcher and user.profile.driver %}
         <li role="presentation"><a href="{% url 'admin:matcher_visitpoint_changelist' %}">{% trans 'Driver schedule' %}</a></li>
     {% endif %}
-
+        <li role="presentation"><a href="/admin/matcher_panel/">{% trans 'Matcher'%}</a></li>
 </ul>
 <br/>
 </div>
