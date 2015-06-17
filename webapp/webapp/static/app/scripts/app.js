@@ -1,24 +1,19 @@
-'use strict';
+angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
 
-angular.module('angApp.directives',[]);
-
-var app = angular
-  .module('angApp', ['restangular', 'angApp.directives', 'ngCookies'], function($interpolateProvider) {
+.config(function($interpolateProvider) {
 //    'restangular'
     $interpolateProvider.startSymbol('[[');
     $interpolateProvider.endSymbol(']]');
-});
+})
 
-app.config(function(RestangularProvider) {
+.config(function(RestangularProvider) {
     RestangularProvider.setBaseUrl('/api');
+})
 
-});
-
-app.filter('uniqueOffer', function() {
+.filter('uniqueOffer', function() {
    return function(collection, keyname) {
       var output = [], 
           keys = [];
-
       angular.forEach(collection, function(item) {
           var key = item.offer[keyname];
           if(keys.indexOf(key) === -1) {
@@ -26,13 +21,26 @@ app.filter('uniqueOffer', function() {
               output.push(item);
           }
       });
-
       return output;
    };
-});
+})
 
-app.controller("matching",function($scope,Restangular,$cookies,$interval){
+.controller("matching",['$scope','Restangular','$interval','$cookies','$q',
+    function($scope,Restangular,$interval,$cookies,$q){ 
     
+    angular.extend($scope, {
+        center: {
+            lat: 45.42,
+            lng: -75.69,
+            zoom: 8
+        },
+        defaults: {
+            scrollWheelZoom: false
+        },
+        markers: {}
+    });
+    $scope.mapopened = false;
+                               
     var mapping = [];
     mapping['1'] = "pending";
     mapping['2'] = "waiting";
@@ -50,7 +58,6 @@ app.controller("matching",function($scope,Restangular,$cookies,$interval){
     
     Restangular.all('drivers').getList()
         .then(function(drivers){
-            console.log(drivers);
             $scope.drivers = drivers;
     });
     
@@ -86,6 +93,72 @@ app.controller("matching",function($scope,Restangular,$cookies,$interval){
                 });
                 $scope.items = items;
             });
+    }
+    
+    $scope.map = function(items){
+        $scope.mapopened = !$scope.mapopened;
+        var map_ben = [];
+        var map_don = [];
+        var map_points = {};
+        var promises = [];
+        
+        var getLatLong = function(location){
+            var temp = location.substring(7, location.length - 1);
+            return temp.split(" ");    
+        }
+        
+        var getLocation = function(user_id,type){
+            var defer = $q.defer();
+            Restangular.all('organization').customGET("",{'user':user_id}).then(function(obj){
+                console.log(item);
+                var item = obj[0];
+                if(type=="donor"){
+                    map_points['d'+item.id]= { lat: Number(parseFloat(getLatLong(item.location)[1]).toFixed(3)) ,
+                                    lng: Number(parseFloat(getLatLong(item.location)[0]).toFixed(3)),
+                                    message: item.name,
+                                    icon:{
+                                        type: 'awesomeMarker',
+                                        icon: 'tag',
+                                        markerColor: 'red'
+                                        }
+                                    }
+                } else {
+                    map_points['b'+item.id]= { lat: Number(parseFloat(getLatLong(item.location)[1]).toFixed(3)),
+                                    lng: Number(parseFloat(getLatLong(item.location)[0]).toFixed(3)),
+                                    message: item.name,
+                                    icon:{
+                                        type: 'awesomeMarker',
+                                        icon: 'cog',
+                                        markerColor: 'red'
+                                            }
+                                    }
+                }
+                defer.resolve();
+            });
+            return defer.promise;
+        }    
+            
+        if($scope.mapopened){
+            angular.forEach(items,function(item){
+                if(item.status>=3){
+                    if(map_ben.indexOf(item.beneficiary.user)== -1){
+                        map_ben.push(item.beneficiary.user);
+                        promises.push(getLocation(item.beneficiary.user,"beneficiary"));
+                    }
+                    if(map_don.indexOf(item.offer.donor)== -1){
+                        map_don.push(item.offer.donor);
+                        promises.push(getLocation(item.offer.donor,"donor"));
+                    }
+                }
+            });
+            $q.all(promises).then(function(){
+                
+                angular.extend($scope, {
+                    markers: map_points
+                });
+                console.log($scope.markers);
+            })
+        }
     }
     
     $scope.viewDonorInInfoBox = function(item){
@@ -179,23 +252,24 @@ app.controller("matching",function($scope,Restangular,$cookies,$interval){
     $scope.changeStatus = function(item,status,driver){
     
         if(item.beneficiary.checked && item.beneficiary.checked == true){
-                var temp = {"id": item.id,
-                            "date": item.date,
-                            "beneficiary_contact_person": item.beneficiary_contact_person,
-                            "quantity": item.quantity,
-                            "hash": item.hash,
-                            "status": status, 
-                            "offer": item.offer.id,
-                            "driver": driver,
-                            "beneficiary": item.beneficiary.id}
+            var temp = {
+                    "id": item.id,
+                    "date": item.date,
+                    "beneficiary_contact_person": item.beneficiary_contact_person,
+                    "quantity": item.quantity,
+                    "hash": item.hash,
+                    "status": status, 
+                    "offer": item.offer.id,
+                    "driver": driver,
+                    "beneficiary": item.beneficiary.id}
                 
-                Restangular.setDefaultHeaders({"X-CSRFToken": $cookies.get('csrftoken')})
-                    .one("temporal_matching_simple",item.id).customPUT(temp)
-                    .then(function(resp){
-                    });
+            Restangular.setDefaultHeaders({"X-CSRFToken": $cookies.get('csrftoken')})
+                .one("temporal_matching_simple",item.id).customPUT(temp)
+                .then(function(resp){
+                });
             }
     }
-});
+}]);
 
 
 

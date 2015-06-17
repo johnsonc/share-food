@@ -1,5 +1,5 @@
 {% extends 'admin/base_site.html' %}
-{% load i18n admin_static %}
+    {% load i18n admin_static %}
 
 {% block breadcrumbs %}<div class="breadcrumbs"><a href="/admin/">
 {% trans "Home" %}</a> > {% trans "Matcher"%}</div>{% endblock %}
@@ -7,6 +7,9 @@
 {% block extrastyle %}
 <link rel="stylesheet" type="text/css" href="/static/admin/css/forms.css">
 <link rel="stylesheet" href="/static/app/styles/matching.css">
+<link rel="stylesheet" href="/static/bower_components/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="/static/js/leaflet.awesome-markers.css">
 {% endblock %}
 
 {% block extrahead %}
@@ -19,8 +22,21 @@
 <script type="text/javascript" src="/static/admin/js/related-widget-wrapper.js"></script>
 <script type="text/javascript" src="/static/admin/js/calendar.js"></script>
 <script type="text/javascript" src="/static/admin/js/admin/DateTimeShortcuts.js"></script>
+<script src="/static/bower_components/lodash/lodash.js"></script>
+
+    
+<!--    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.6/angular.min.js"></script>-->
+<!--    -->
+<script src="/static/bower_components/angular/angular.js"></script>
+<script src="/static/bower_components/leaflet/dist/leaflet.js"></script>
+<script src="/static/js/leaflet.awesome-markers.js"></script>
+<script src="/static/js/dist/angular-leaflet-directive.min.js"</script>
+<script src="/static/bower_components/angular-route/angular-route.js"></script>
+<script src="/static/bower_components/restangular/dist/restangular.js"></script>
+<script src="/static/app/scripts/app.js"></script>
+<script src="/static/bower_components/angular-cookies/angular-cookies.js"></script>
 {% endblock %}
-{% block bodyclass %}angular" ng-app="angApp{% endblock %}
+{% block bodyclass %}angular" ng-app="angapp{% endblock %}
 {% block content %}
         {% block object-tools %}{% endblock %}
         {{ content }}
@@ -90,9 +106,6 @@
                         <div>
                             <div class="box radio_select" ng-model="select">
                                 <label class="radio-inline">
-                                
-                                </label>
-                                <label class="radio-inline">
                                   <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value=""> {% trans "all"%}
                                 </label>
                                 <label class="radio-inline">
@@ -155,11 +168,17 @@
                                    <label class="radio-inline">
                                     {% trans "Sum:"%} [[sumOf(filtItems)]]
                                    </label>
+                                   <button type="button" class="btn btn-small" 
+                                      ng-click="map(items)" >{% trans "Show on map"%}</button>
                                 </div>
                             </div>
                         </div>
-                    
                 </div>
+                </fieldset>
+                <fieldset class="module aligned all_page" ng-show="mapopened">
+                    <h2>{% trans "Map:"%}</h2> 
+                    <leaflet  height="480px" width="100%" defaults="defaults" center="center"
+                        markers="markers" ></leaflet>
                 </fieldset>
                 <fieldset class="module aligned all_page">
                     <h2>{% trans "Drivers:"%}</h2>
@@ -263,16 +282,9 @@
     <script type="text/javascript">
         (function($) {
             var field;
-
-
         })(django.jQuery);
     </script>
-    <script src="/static/bower_components/lodash/lodash.js"></script>
-    <script src="/static/bower_components/angular/angular.js"></script>
-    <script src="/static/bower_components/angular-cookies/angular-cookies.js"></script>
-    <script src="/static/bower_components/restangular/dist/restangular.js"></script>
-    <script src="/static/bower_components/restangular/dist/restangular.min.js"></script>
-    <script src="/static/app/scripts/app.js"></script>
+    
 <div class="calendarbox module" id="calendarbox0" style="display: none; position: absolute; left: 284px; top: 143px;">
        <div>
            <a href="javascript:DateTimeShortcuts.drawPrev(0);" class="calendarnav-previous">&lt;</a>

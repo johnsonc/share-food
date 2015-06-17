@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from api.serializer import OfferSerializer, TemporalMatchingSerializer, BeneficiarySimpleSerializer,\
-                            TemporalMatchingSimpleSerializer, DriverSerializer
+                            TemporalMatchingSimpleSerializer, DriverSerializer, OrganizationSerializer
 
 from rest_framework import routers
 
@@ -8,6 +8,7 @@ from rest_framework import routers
 from donor.models import Offer
 from matcher.models import TemporalMatching, Driver
 from beneficiary.models import Beneficiary
+from profiles.models import Organization
 
 import datetime
 
@@ -106,6 +107,26 @@ class DriverViewSet(viewsets.ModelViewSet):
     """
     serializer_class = DriverSerializer
     queryset = Driver.objects.all()
+    
 router.register(r'drivers', DriverViewSet)
+
+
+class OrganizationViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for viewing and editing user instances.
+    """
+    serializer_class = OrganizationSerializer
+    queryset = Organization.objects.all()
+    
+    def get_queryset(self):
+        if len(self.request.GET)>0:
+            user = self.request.GET.get('user','')
+            
+            
+            return Organization.objects.filter(user_id = user)
+        else:
+            return self.queryset
+    
+router.register(r'organization', OrganizationViewSet)
 
 
