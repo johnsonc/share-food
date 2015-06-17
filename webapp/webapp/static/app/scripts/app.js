@@ -103,15 +103,12 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         var promises = [];
         
         var getLatLong = function(location){
-            console.log(location);
             var temp = location.substring(7, location.length - 1);
-            console.log(temp);
             return temp.split(" ");    
         }
         
         var getLocation = function(user_id,type){
             var defer = $q.defer();
-            console.log("user id " + user_id);
             Restangular.all('organization').customGET("",{'user':user_id}).then(function(obj){
                 console.log(item);
                 var item = obj[0];
