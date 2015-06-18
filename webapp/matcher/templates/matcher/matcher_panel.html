@@ -89,7 +89,8 @@
                                   </thead>
                                   <tbody>
 
-                                      <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);">
+                                      <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);"  
+                                         ng-class="{ bg_col:item.offer.showcolor}">
                                           <th>[[item.offer.id]]</th>
                                           <th>[[item.offer.name]]</th>
                                           <th>[[percentage(item.offer) | number:2]]%</th>
@@ -174,6 +175,8 @@
                                    </label>
                                    <button type="button" class="btn btn-small" 
                                       ng-click="map(items)" >{% trans "Show on map"%}</button>
+                                   <button type="button" class="btn btn-small" 
+                                      ng-click="getList(incomedate)" >{% trans "Refresh beneficiary list"%}</button>
                                 </div>
                             </div>
                         </div>
@@ -204,7 +207,7 @@
                                                   ng-model="$parent.picked" 
                                                   ng-change="beneficiaryChanged(items)" value="[[item.id]]"></th>
                                           <th>[[item.id]]</th>
-                                          <th>[[item.user.username]]  [[radioselect.picked]]</th>
+                                          <th>[[item.username]]</th>
                                       </tr>
                                       
                                   </tbody>
@@ -236,7 +239,7 @@
                             <div class="info_box">
                                 <h1>[[viewBen.group.name]]</h1>
                                 <div>{% trans "Belongs to:"%} [[viewBen.group.name]]</div>
-                                <div>{% trans "Current storage capacity:"%} ?????</div>
+<!--                                <div>{% trans "Current storage capacity:"%} ?????</div>-->
                                 <ul>
                                     <li>{% trans "frozen:"%} [[viewBen.frozen_capacity]]</li>
                                     <li>{% trans "refrigerated:"%} [[viewBen.refrigerated_capacity]]</li>
@@ -289,7 +292,7 @@
         })(django.jQuery);
     </script>
     
-<div class="calendarbox module" id="calendarbox0" style="display: none; position: absolute; left: 284px; top: 143px;">
+<div class="calendarbox module" id="calendarbox0" style="display: none; position: absolute; left: 284px; top: 143px;"  ng-click="refresh(incomedate)">
        <div>
            <a href="javascript:DateTimeShortcuts.drawPrev(0);" class="calendarnav-previous">&lt;</a>
            <a href="javascript:DateTimeShortcuts.drawNext(0);" class="calendarnav-next">&gt;</a>
@@ -299,7 +302,140 @@
            <tbody><tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr><tr>
            <td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> 
            </td><td class="nonday"> </td><td class="">
-           <a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,1));">1</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,2));">2</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,3));">3</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,4));">4</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,5));">5</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,6));">6</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,7));">7</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,8));">8</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,9));">9</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,10));">10</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,11));">11</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,12));">12</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,13));">13</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,14));">14</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,15));">15</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,16));">16</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,17));">17</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,18));">18</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,19));">19</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,20));">20</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,21));">21</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,22));">22</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,23));">23</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,24));">24</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,25));">25</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,26));">26</a></td><td class="today"><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,27));">27</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,28));">28</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,29));">29</a></td><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,30));">30</a></td></tr><tr><td class=""><a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');DateTimeShortcuts.calendarInputs[0].focus();document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,31));">31</a></td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td></tr></tbody></table></div><div class="calendar-shortcuts"><a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, -1);">Yesterday</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, 0);">Today</a>&nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, +1);">Tomorrow</a></div><p class="calendar-cancel"><a href="javascript:DateTimeShortcuts.dismissCalendar(0);">Cancel</a></p></div>    
+           <a href="javascript:void(function(y, m, d) 
+               { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                 DateTimeShortcuts.calendarInputs[0].focus();
+                 document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';
+                 }(2015,5,1));">1
+                 </a></td><td class="">
+                 <a href="javascript:void(function(y, m, d) { 
+                     DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                     DateTimeShortcuts.calendarInputs[0].focus();
+                     document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,2));">2</a>
+                     </td></tr><tr><td class="">
+            <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,3));">3</a>
+                </td><td class="">
+            <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,4));">4</a>
+                </td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                    DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                    DateTimeShortcuts.calendarInputs[0].focus();
+                    document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,5));">5</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,6));">6</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,7));">7</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,8));">8</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,9));">9</a></td></tr><tr><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,10));">10</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,11));">11</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,12));">12</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,13));">13</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,14));">14</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,15));">15</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,16));">16</a></td></tr><tr>
+                <td class=""><a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,17));">17</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,18));">18</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,19));">19</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,20));">20</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,21));">21</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,22));">22</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,23));">23</a></td></tr><tr><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,24));">24</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,25));">25</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,26));">26</a></td><td class="today">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,27));">27</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,28));">28</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,29));">29</a></td><td class="">
+                <a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,30));">30</a></td></tr><tr>
+                <td class=""><a href="javascript:void(function(y, m, d) { 
+                DateTimeShortcuts.calendarInputs[0].value = new Date(y, m-1, d).strftime('%Y-%m-%d');
+                DateTimeShortcuts.calendarInputs[0].focus();
+                document.getElementById(DateTimeShortcuts.calendarDivName1+0).style.display='none';}(2015,5,31));">31</a></td>
+                <td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> 
+                </td><td class="nonday"> </td><td class="nonday"> </td><td class="nonday"> </td></tr></tbody></table></div>
+                <div class="calendar-shortcuts"><a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, -1);">Yesterday</a>
+                &nbsp;|&nbsp;<a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, 0);">Today</a>&nbsp;|&nbsp;
+                <a href="javascript:DateTimeShortcuts.handleCalendarQuickLink(0, +1);">Tomorrow</a></div><p class="calendar-cancel">
+                <a href="javascript:DateTimeShortcuts.dismissCalendar(0);">Cancel</a></p></div>    
         
         
 {% endblock %}

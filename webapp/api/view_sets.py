@@ -1,8 +1,10 @@
 from rest_framework import viewsets
 from api.serializer import OfferSerializer, TemporalMatchingSerializer, BeneficiarySimpleSerializer,\
-                            TemporalMatchingSimpleSerializer, DriverSerializer, OrganizationSerializer
+                            TemporalMatchingSimpleSerializer, DriverSerializer, OrganizationSerializer,\
+                            UserSerializer
 
 from rest_framework import routers
+from django.contrib.auth.models import User
 
 #models
 from donor.models import Offer
@@ -105,8 +107,8 @@ class DriverViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing user instances.
     """
-    serializer_class = DriverSerializer
-    queryset = Driver.objects.all()
+    serializer_class = UserSerializer
+    queryset = User.objects.filter(profile__driver=True)
     
 router.register(r'drivers', DriverViewSet)
 
