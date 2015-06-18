@@ -19,32 +19,36 @@
 <div style="padding-top:30px">
 
 <ul class="nav nav-pills">
-    {% if perms.donor %}
-    <li role="presentation"><a href="{% url 'admin:donor_offer_changelist' %}">{% trans 'Donations' %}</a></li>
-    {% endif %}
+    {% if user.is_authenticated %}
 
-    {% if perms.beneficiary and user.beneficiary_profile.pk %}
-        <li role="presentation"><a href="{% url 'admin:beneficiary_beneficiary_change' user.beneficiary_profile.pk %}">{% trans 'Beneficiary settings' %}</a></li>
-    {% endif %}
+        {% if user.is_superuser or user.profile.donor %}
+        <li role="presentation"><a href="{% url 'admin:donor_offer_changelist' %}">{% trans 'Donations' %}</a></li>
+        {% endif %}
 
-    {% if perms.matcher and not user.profile.driver %}
-        <li role="presentation"><a href="{% url 'admin:matcher_matched_changelist' %}">{% trans 'Delivery schedule' %}</a></li>
-    {% endif %}
+        {% if user.is_superuser %}
+            <li role="presentation"><a href="{% url 'admin:beneficiary_beneficiary_changelist' %}">{% trans 'Beneficiaries' %}</a></li>
+        {% endif %}
 
-    {% if perms.profiles and user.organization %}
+        {% if user.profile.beneficiary %}
+            <li role="presentation"><a href="{% url 'admin:beneficiary_beneficiary_change' user.beneficiary_profile.pk %}">{% trans 'Beneficiary settings' %}</a></li>
+        {% endif %}
+
+        {% if user.is_superuser or not user.profile.driver %}
+            <li role="presentation"><a href="{% url 'admin:matcher_matched_changelist' %}">{% trans 'Delivery schedule' %}</a></li>
+        {% endif %}
+
+
         <li role="presentation"><a href="{% url 'admin:profiles_organization_change' user.organization.pk %}">{% trans 'Organization' %}</a></li>
-    {% endif %}
 
-    {% if perms.profiles and user.profile %}
-        <li role="presentation"><a href="{% url 'admin:profiles_profile_change' user.profile.pk %}">{% trans 'Profile' %}</a></li>
-    {% endif %}
 
-    {% if perms.matcher and user.profile.driver %}
-        <li role="presentation"><a href="{% url 'admin:matcher_visitpoint_changelist' %}">{% trans 'Driver schedule' %}</a></li>
-    {% endif %}
+        {% if user.is_superuser or user.profile.driver %}
+            <li role="presentation"><a href="{% url 'admin:matcher_visitpoint_changelist' %}">{% trans 'Driver schedule' %}</a></li>
+        {% endif %}
 
-    {% if perms.matcher and user.profile.operator %}
-        <li role="presentation"><a href="/admin/matcher_panel/">{% trans 'Matcher'%}</a></li>
+        {% if user.is_superuser or user.profile.operator %}
+            <li role="presentation"><a href="/admin/matcher_panel/">{% trans 'Matcher'%}</a></li>
+        {% endif %}
+
     {% endif %}
 
 </ul>

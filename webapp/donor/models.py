@@ -1,11 +1,14 @@
+from datetime import datetime
 from django.db import models
 from django.utils.translation import ugettext as _
 from datetime import datetime, timedelta
 from django.utils import timezone
+from django.db.models.signals import post_save
 from profiles.models import Organization
 from django.contrib.auth.models import User
 from beneficiary.models import BeneficiaryGroup
 from dictionaries.models import FoodCategory, MeatIssues, ReligiousIssues, PackagingCategory, TemperatureCategory, FoodIngredients, DaysOfTheWeek
+from profiles.models import DAYS_OF_THE_WEEK
 import pytz
 
 
@@ -37,6 +40,8 @@ class Offer(models.Model):
     time_from = models.DateTimeField(default=timezone.now())
     time_to = models.DateTimeField(default=(timezone.now() + timedelta(days=1)))
 
+    valid_to = models.DateField(default=(timezone.now() + timedelta(days=1)))
+
     repeating = models.BooleanField(default=False)
     open = models.BooleanField(default=False)
 
@@ -49,24 +54,18 @@ class Offer(models.Model):
 
 
 class OfferRepetition(models.Model):
-    """
-    DAYS_OF_THE_WEEK = (
-        ('Mon', _('Monday')),
-        ('Tue', _('Tuesday')),
-        ('Wed', _('Wednesday')),
-        ('Thu', _('Thursday')),
-        ('Fri', _('Friday')),
-        ('Sat', _('Saturday')),
-        ('Sun', _('Sunday'))
-
+    DAYWEEK_OF_THE_MONTH = (
+        (0, _('Every week')),
+        (1, _('1st in the month')),
+        (2, _('2nd in the month')),
+        (3, _('3rd in the month')),
+        (4, _('4th in the month')),
     )
-    """
-    offer = models.ForeignKey(Offer)
-    day_freq = models.PositiveSmallIntegerField(verbose_name=_('Day frequency'))
+    offer = models.ForeignKey(Offer, related_name='repetitions')
     date_start = models.DateField()
     date_stop = models.DateField()
-    days_of_week = models.ManyToManyField(DaysOfTheWeek, blank=True, null=True)
-    #day_of_week = models.CharField(max_length=3, choices=DAYS_OF_THE_WEEK)
+    day_of_week = models.IntegerField(choices=DAYS_OF_THE_WEEK)
+    day_freq = models.PositiveSmallIntegerField(verbose_name=_('Day frequency'), choices=DAYWEEK_OF_THE_MONTH)
 
     class Meta:
         verbose_name = _('Repetition')
@@ -74,3 +73,11 @@ class OfferRepetition(models.Model):
 
     def __unicode__(self):
         return '%s repetition' % self.offer.name
+
+
+def update_valid_to_date(sender, instance, **kwargs):
+    pass
+    #valid_to = instance.date
+    # TODO !!!
+
+post_save.connect(update_valid_to_date, sender=OfferRepetition)

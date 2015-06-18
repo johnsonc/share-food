@@ -4,6 +4,7 @@ from django.utils.translation import ugettext as _
 from django.core import urlresolvers
 from .models import Beneficiary, DeliveryTimeWindows, BeneficiaryGroup
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.contrib.auth.models import User
 
 
@@ -36,7 +37,6 @@ class BeneficiaryAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = []
         if not request.user.is_superuser:
-            #self.exclude.append('user') #here!
             if self.fieldsets[0][0] == 'User':
                 self.fieldsets = self.fieldsets[1:]
         else:
@@ -64,15 +64,15 @@ class BeneficiaryAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(user=request.user)
-    """
+
     def changelist_view(self, request):
         if not request.user.is_superuser:
             return redirect(
-                urlresolvers.reverse("admin:auth_user_change", args=(request.user.id,)),
+                urlresolvers.reverse("admin:beneficiary_beneficiary_change", args=(request.user.beneficiary_profile.id,)),
             )
         else:
-            return super(UserWithProfileAdmin, self).changelist_view(request)
-    """
+            return super(BeneficiaryAdmin, self).changelist_view(request)
+
 site.register(BeneficiaryGroup)
 site.register(Beneficiary, BeneficiaryAdmin)
 

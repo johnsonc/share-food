@@ -3,6 +3,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.auth.models import User
 from profiles.models import Organization
 from dictionaries.models import FoodCategory, FoodIngredients, MeatIssues, ReligiousIssues
+from profiles.models import DAYS_OF_THE_WEEK
 
 
 class BeneficiaryGroup(models.Model):
@@ -10,7 +11,6 @@ class BeneficiaryGroup(models.Model):
 
     def __unicode__(self):
         return self.name
-
 
 class Beneficiary(models.Model):
     group = models.ForeignKey(BeneficiaryGroup, blank=True, null=True)
@@ -47,18 +47,8 @@ class Beneficiary(models.Model):
 
 
 class DeliveryTimeWindows(models.Model):
-    DAYS_OF_THE_WEEK = (
-        ('Mon', _('Monday')),
-        ('Tue', _('Tuesday')),
-        ('Wed', _('Wednesday')),
-        ('Thu', _('Thursday')),
-        ('Fri', _('Friday')),
-        ('Sat', _('Saturday')),
-        ('Sun', _('Sunday'))
-
-    )
     beneficiary = models.ForeignKey(Beneficiary, related_name='deliveries')
-    day_of_week = models.CharField(max_length=3, choices=DAYS_OF_THE_WEEK)
+    day_of_week = models.IntegerField(choices=DAYS_OF_THE_WEEK)
     time_from = models.TimeField()
     time_to = models.TimeField()
 

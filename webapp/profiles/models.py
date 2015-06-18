@@ -3,6 +3,15 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from matcher.models import Driver
+
+DAYS_OF_THE_WEEK = ((0, _('Monday')),
+                    (1, _('Tuesday')),
+                    (2, _('Wednesday')),
+                    (3, _('Thursday')),
+                    (4, _('Friday')),
+                    (5, _('Saturday')),
+                    (6, _('Sunday')))
 
 
 class Organization(models.Model):
@@ -43,12 +52,10 @@ class Profile(models.Model):
     )
 
     user = models.OneToOneField(User, related_name="profile")
-
-    address = models.CharField(max_length=255)
-    tel_1 = models.CharField(max_length=255)
-    tel_2 = models.CharField(max_length=255, blank=True, null=True)
     default_mass_unit = models.CharField(max_length=5, choices=MASS_UNITS, default='kg') #Changed from positive integer
-    location = models.PointField(blank=True, null=True)
+
+    donor = models.BooleanField(default=False)
+    beneficiary = models.BooleanField(default=False)
     driver = models.BooleanField(default=False)
     operator = models.BooleanField(default=False)
 
@@ -63,31 +70,39 @@ class Profile(models.Model):
 
 
 def create_defaults(sender, instance, created, raw, using, update_fields, **kwargs):
-    from django.contrib.gis.geos import Point
-    print 'create_defaults'
-    """
-    if created:
-        print 'new user created'
-        p, created = Profile.objects.get_or_create(user=instance)
-        if created:
-            print 'new profile created'
-            p.address = ""
-            p.tel_1 = ""
-            p.tel_2 = ""
-            default_mass_unit = 'kg'
-            location=Point(-101.185547, 56.536854)
-            p.save()
+    if not created:
+        return
 
-        o = Organization(name=Organization.DEFAULT_ORGANIZATION_NAME,
-                            address='',
-                            first_name='',
-                            last_name='',
-                            tel_1='',
-                            tel_2='',
-                            email='',
-                            default_mass_unit='',
-                            location=Point(-101.185547, 56.536854),
-                            user=instance)
-        o.save()
-    """
+    from django.contrib.auth.models import Permission, Group
+    from django.contrib.contenttypes.models import ContentType
+    profile = instance.profile
+
+    if profile.donor:
+        instance.groups = [Group.objects.get(name='Donor')]
+
+    if profile.driver:
+        instance.groups = [Group.objects.get(name='Driver')]
+
+        driver = Driver(user=instance)
+        driver.save()
+
+    if profile.operator:
+        instance.groups = [Group.objects.get(name='Operator')]
+
+    if profile.beneficiary:
+        instance.groups = [Group.objects.get(name='Beneficiary')]
+
+        from beneficiary.models import Beneficiary
+        beny = Beneficiary(
+            num_meals=0,
+            frozen_capacity=0,
+            refrigerated_capacity=0,
+            drystorage_capacity=0,
+            user=instance
+        )
+        beny.save()
+    instance.email = instance.organization.email
+    instance.is_staff = True
+    instance.save()
+
 post_save.connect(create_defaults, sender=User)
