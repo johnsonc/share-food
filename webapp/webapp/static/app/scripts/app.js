@@ -61,6 +61,13 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
             $scope.drivers = drivers;
     });
     
+    var link = 0;
+    
+    var timer = $interval( function(){
+        var myEl = angular.element( document.querySelector( '#id_date' ) );
+        $scope.incomedate = myEl[0].value;
+    }, 1000);    
+
 //    var timer = $interval( function(){
 //        if($scope.incomedate){
 //            Restangular.all('temporal_matching')
@@ -87,11 +94,13 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     
     $scope.getList = function(in_date){
         var temp_matching = Restangular.all('temporal_matching');
+        if(in_date.length>8)
         temp_matching.customGET("",{'date':""+in_date}).then(function(items){
                 angular.forEach(items,function(item){
                     item.status_maped = mapping[item.status];
                 });
                 $scope.items = items;
+                $scope.select.offer = {};
             });
     }
     
@@ -111,7 +120,6 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         var getLocation = function(user_id,type){
             var defer = $q.defer();
             Restangular.all('organization').customGET("",{'user':user_id}).then(function(obj){
-                console.log(item);
                 var item = obj[0];
                 if(type=="donor"){
                     map_points['d'+item.id]= { lat: Number(parseFloat(getLatLong(item.location)[1]).toFixed(3)) ,
@@ -146,18 +154,18 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                         map_ben.push(item.beneficiary.user);
                         promises.push(getLocation(item.beneficiary.user,"beneficiary"));
                     }
-                    if(map_don.indexOf(item.offer.donor)== -1){
-                        map_don.push(item.offer.donor);
-                        promises.push(getLocation(item.offer.donor,"donor"));
-                    }
                 }
+                if(map_don.indexOf(item.offer.donor)== -1){
+                    map_don.push(item.offer.donor);
+                    promises.push(
+                        getLocation(item.offer.donor,"donor"));
+                    }
             });
             $q.all(promises).then(function(){
                 
                 angular.extend($scope, {
                     markers: map_points
                 });
-                console.log($scope.markers);
             })
         }
     }
@@ -165,6 +173,12 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     $scope.viewDonorInInfoBox = function(item){
         $scope.select.offer = {id:item.id};
         $scope.viewDonor = item;
+        item.showcolor = true;
+        angular.forEach($scope.items,function(obj){
+            if(obj.offer.id != item.id){
+                obj.offer.showcolor = false;                
+            }
+        })
     }
     $scope.viewBenInInfoBox = function(item){
         $scope.viewBen = item;
@@ -203,7 +217,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     $scope.sumOf = function(items){
         if(items!=undefined)
             return items.reduce( function(total, item){
-                  return total + item.quantity
+                  return total + Number(item.quantity)
                 }, 0);
         else
             return 0;
@@ -243,10 +257,10 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         var temp = 0;
         angular.forEach($scope.items, function(item){
             if(item.offer.id == offer.id && item.status>=3 ){
-                temp += item.quantity
+                temp += Number(item.quantity)
             }
         });
-        var calculation = (temp/offer.estimated_mass) * 100;
+        var calculation = (temp/Number(offer.estimated_mass)) * 100;
         return  calculation;
     }
     
@@ -267,6 +281,9 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
             Restangular.setDefaultHeaders({"X-CSRFToken": $cookies.get('csrftoken')})
                 .one("temporal_matching_simple",item.id).customPUT(temp)
                 .then(function(resp){
+                    item.status_maped = mapping[resp.status];
+                    item.status = resp.status;
+                    $scope.beneficiaryChanged($scope.items);
                 });
             }
     }
