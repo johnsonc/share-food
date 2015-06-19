@@ -30,9 +30,9 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     
     angular.extend($scope, {
         center: {
-            lat: 45.42,
-            lng: -75.69,
-            zoom: 8
+            lat: 44.097,
+            lng: -79.552,
+            zoom: 7
         },
         defaults: {
             scrollWheelZoom: false
