@@ -101,6 +101,7 @@ class ProfileForUser(admin.ModelAdmin):
 
 class OrganizationAdmin(admin.OSMGeoAdmin):
     model = Organization
+    exclude = ('user',)
 
     def get_queryset(self, request):
         qs = super(OrganizationAdmin, self).get_queryset(request)
@@ -117,8 +118,14 @@ class OrganizationAdmin(admin.OSMGeoAdmin):
         else:
             return super(OrganizationAdmin, self).changelist_view(request)
 
+    def get_form(self, request, obj=None, **kwargs):
+        self.exclude = []
+        if not request.user.is_superuser:
+            self.exclude.append('user')
+
+        return super(OrganizationAdmin, self).get_form(request, obj, **kwargs)
+
 
 site.register(User, UserWithProfileAdmin)
 site.register(Group)
 site.register(Organization, OrganizationAdmin)
-#site.register(Profile, ProfileForUser)
