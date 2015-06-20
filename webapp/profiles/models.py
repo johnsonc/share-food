@@ -70,11 +70,12 @@ class Profile(models.Model):
 
 
 def create_defaults(sender, instance, created, raw, using, update_fields, **kwargs):
-    if not created:
+    if not created or instance.profile is None:
         return
 
     from django.contrib.auth.models import Permission, Group
     from django.contrib.contenttypes.models import ContentType
+
     profile = instance.profile
 
     if profile.donor:
