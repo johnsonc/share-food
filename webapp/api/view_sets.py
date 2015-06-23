@@ -97,7 +97,7 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
             return
         from pinax.notifications import models as notifications
 
-        beny = Beneficiary.objects.filter(id=beneficiary_id)
+        beny = Beneficiary.objects.get(id=beneficiary_id)
         notifications.send([beny.user], "offer_to_beneficiary", {'beneficiary': beny})
     
 router.register(r'temporal_matching_simple', TempMatchSimpleViewSet)
