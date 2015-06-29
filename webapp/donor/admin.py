@@ -33,6 +33,9 @@ class OfferAdmin(admin.ModelAdmin):
         ('Time info', {
             'fields': (('time_from', 'time_to',),)
         }),
+        ('Date', {
+            'fields': ('date',)
+        })
         ]
 
     inlines = [
@@ -40,8 +43,6 @@ class OfferAdmin(admin.ModelAdmin):
         ]
 
     list_display = ('name', 'estimated_mass', 'temperature', 'time_from', 'time_to', 'packaging')
-
-    #list_filter = ('food_category', 'temperature', 'packaging')
 
     def active(self, obj):
         return True

@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from profiles.models import Organization
 from dictionaries.models import FoodCategory, FoodIngredients, MeatIssues, ReligiousIssues
 from profiles.models import DAYS_OF_THE_WEEK
+from django.db.models.signals import post_save, post_delete
+from datetime import date
 
 
 class BeneficiaryGroup(models.Model):
@@ -11,6 +13,7 @@ class BeneficiaryGroup(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class Beneficiary(models.Model):
     group = models.ForeignKey(BeneficiaryGroup, blank=True, null=True)
@@ -44,6 +47,13 @@ class Beneficiary(models.Model):
 
     def get_timewindows(self):
         return self.deliveries.all()
+
+
+def process_new_beneficiary(sender, instance, created, **kwargs):
+    from matcher.matcher import match_beneficiaries_to_offers
+    match_beneficiaries_to_offers(instance, date.today(), 7)
+
+post_save.connect(process_new_beneficiary, sender=Beneficiary)
 
 
 class DeliveryTimeWindows(models.Model):

@@ -5,3 +5,4 @@ djangorestframework
 markdown
 django-filter
 pinax-notifications==2.0.1
+model_mommy==1.2.4

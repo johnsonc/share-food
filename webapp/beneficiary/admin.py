@@ -37,9 +37,11 @@ class BeneficiaryAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         self.exclude = []
         if not request.user.is_superuser:
+            self.readonly_fields = ('group',)
             if self.fieldsets[0][0] == 'User':
                 self.fieldsets = self.fieldsets[1:]
         else:
+            self.readonly_fields = []
             if self.fieldsets[0][0] == _('Basic info'):
                 self.fieldsets.insert(0, ('User', {'fields': ('user',)}))
 
