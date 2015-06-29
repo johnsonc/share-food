@@ -150,8 +150,9 @@
                                       </tr>
                                   </thead>
                                   <tbody>
-                                      <tr ng-repeat="item in (filtItems=(items | filter:select:false ))" ng-click="viewBenInInfoBox(item.beneficiary)">
-                                          <th><input type="checkbox" name="TabOptions" id="1" 
+                                      <tr ng-repeat="item in (filtItems=(items | filter:select:false ))" 
+                                         ng-click="viewBenInInfoBox(item.beneficiary)" >
+                                          <th><input type="checkbox" name="TabOptions" id="[[$index]]" 
                                                   ng-model="item.beneficiary.checked" 
                                                   ng-change="beneficiaryChanged(items)"></th>
                                           <th>[[item.beneficiary.id]]</th>
@@ -174,7 +175,7 @@
                                     {% trans "Sum:"%} [[sumOf(filtItems)]]
                                    </label>
                                    <button type="button" class="btn btn-small" 
-                                      ng-click="map(items)" >{% trans "Show on map"%}</button>
+                                      ng-click="mapopened=!mapopened;map(filtItems)" >{% trans "Show on map"%}</button>
                                    <button type="button" class="btn btn-small" 
                                       ng-click="getList(incomedate)" >{% trans "Refresh beneficiary list"%}</button>
                                 </div>
@@ -185,7 +186,7 @@
                 <fieldset class="module aligned all_page" ng-show="mapopened">
                     <h2>{% trans "Map:"%}</h2> 
                     <leaflet  height="480px" width="100%" defaults="defaults" center="center"
-                        markers="markers" ></leaflet>
+                        markers="markers" paths="paths" ></leaflet>
                 </fieldset>
                 <fieldset class="module aligned all_page">
                     <h2>{% trans "Drivers:"%}</h2>
