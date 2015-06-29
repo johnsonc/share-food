@@ -156,7 +156,8 @@
                                                   ng-model="item.beneficiary.checked" 
                                                   ng-change="beneficiaryChanged(items)"></th>
                                           <th>[[item.beneficiary.id]]</th>
-                                          <th>[[item.beneficiary.group.name]]</th>
+                                          <th>[[item.beneficiary_contact_person]]</th>
+<!--                                             <th>[[item.beneficiary.group.name]]</th>-->
                                           <th>[[item.status_maped]]</th>
                                           <th>[[item.beneficiary.num_meals]]</th>
                                           <th ng-init="qanti=true"><span ng-show="qanti" ng-click="qanti=!qanti">[[item.quantity]]</span> 

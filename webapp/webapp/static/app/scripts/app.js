@@ -134,12 +134,12 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                     map_points['b'+item.id]= { 
                                     lat: temp_lat,
                                     lng: temp_lng,
-                                    message: item.name,
+                                    message: name,
                                     icon:{
                                         type: 'awesomeMarker',
                                         icon: 'cog',
                                         markerColor: (status >= 3 ? "green" : "red")
-                                            }
+                                        }
                                     }
                 }
                 defer.resolve();
@@ -177,7 +177,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                 if(item.status>=0){
                     if(map_ben.indexOf(item.beneficiary.user)== -1){
                         map_ben.push(item.beneficiary.user);
-                        promises.push(getLocation(item.beneficiary.user,"beneficiary",item.status));
+                        promises.push(getLocation(item.beneficiary.user,"beneficiary",item.status,item.beneficiary_contact_person));
                     }
                 }
                 if(map_don.indexOf(item.offer.donor)== -1){
