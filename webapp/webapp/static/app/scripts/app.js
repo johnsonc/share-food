@@ -37,7 +37,8 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         defaults: {
             scrollWheelZoom: false
         },
-        markers: {}
+        markers: {},
+        paths: {}
     });
     $scope.mapopened = false;
                                
@@ -67,19 +68,6 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         var myEl = angular.element( document.querySelector( '#id_date' ) );
         $scope.incomedate = myEl[0].value;
     }, 1000);    
-
-//    var timer = $interval( function(){
-//        if($scope.incomedate){
-//            Restangular.all('temporal_matching')
-//                .customGET("",{'date':""+$scope.incomedate})
-//                .then(function(items){
-//                    angular.forEach(items,function(item){
-//                        item.status_maped = mapping[item.status];
-//                    });
-//                $scope.items = items;
-//            });
-//        }
-//    }, 10000);
     
     $scope.$on('$destroy', function() {
           $interval.cancel(timer);
@@ -90,7 +78,13 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         function(newValue, oldValue){
             if(newValue!=oldValue)
                 $scope.getList(newValue);
-    });
+    });  
+
+    $scope.$watchCollection("filtItems",
+         function( newValue, oldValue ) {
+            $scope.map($scope.filtItems);
+        } );
+        
     
     $scope.getList = function(in_date){
         var temp_matching = Restangular.all('temporal_matching');
@@ -106,9 +100,10 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     
     
     $scope.map = function(items){
-        $scope.mapopened = !$scope.mapopened;
+        
         var map_ben = [];
         var map_don = [];
+        var lines = [];
         var map_points = {};
         var promises = [];
         
@@ -117,14 +112,18 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
             return temp.split(" ");    
         }
         
-        var getLocation = function(user_id,type){
+        var getLocation = function(user_id,type,status,name){
             var defer = $q.defer();
             Restangular.all('organization').customGET("",{'user':user_id}).then(function(obj){
+                
                 var item = obj[0];
+                var temp_lat = Number(parseFloat(getLatLong(item.location)[1]).toFixed(3));
+                var temp_lng = Number(parseFloat(getLatLong(item.location)[0]).toFixed(3));
                 if(type=="donor"){
-                    map_points['d'+item.id]= { lat: Number(parseFloat(getLatLong(item.location)[1]).toFixed(3)) ,
-                                    lng: Number(parseFloat(getLatLong(item.location)[0]).toFixed(3)),
-                                    message: item.name,
+                    map_points['d'+item.id]= { 
+                                    lat: temp_lat ,
+                                    lng: temp_lng ,
+                                    message: name,
                                     icon:{
                                         type: 'awesomeMarker',
                                         icon: 'tag',
@@ -132,39 +131,69 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                                         }
                                     }
                 } else {
-                    map_points['b'+item.id]= { lat: Number(parseFloat(getLatLong(item.location)[1]).toFixed(3)),
-                                    lng: Number(parseFloat(getLatLong(item.location)[0]).toFixed(3)),
-                                    message: item.name,
+                    map_points['b'+item.id]= { 
+                                    lat: temp_lat,
+                                    lng: temp_lng,
+                                    message: name,
                                     icon:{
                                         type: 'awesomeMarker',
                                         icon: 'cog',
-                                        markerColor: 'red'
-                                            }
+                                        markerColor: (status >= 3 ? "green" : "red")
+                                        }
                                     }
                 }
                 defer.resolve();
             });
             return defer.promise;
         }    
-            
+        
+        var createLine = function(us_id1,us_id2,index){
+            var defer = $q.defer();
+            Restangular.all('organization').customGET("",{'user':us_id1}).then(function(obj){
+                var item = obj[0];
+                var us1_lat = Number(parseFloat(getLatLong(item.location)[1]).toFixed(3));
+                var us1_lng = Number(parseFloat(getLatLong(item.location)[0]).toFixed(3));
+                Restangular.all('organization').customGET("",{'user':us_id2}).then(function(obj){
+                    var item = obj[0];
+                    var us2_lat = Number(parseFloat(getLatLong(item.location)[1]).toFixed(3));
+                    var us2_lng = Number(parseFloat(getLatLong(item.location)[0]).toFixed(3));
+                    
+                    lines[index] = {
+                        color: 'green',
+                        weight: 2,
+                        latlngs: [
+                            { lat: us1_lat, lng: us1_lng },
+                            { lat: us2_lat, lng: us2_lng }
+                        ]
+                    }
+                    defer.resolve(); 
+                });
+            });
+            return defer.promise;
+        }    
+        
         if($scope.mapopened){
             angular.forEach(items,function(item){
-                if(item.status>=3){
+                if(item.status>=0){
                     if(map_ben.indexOf(item.beneficiary.user)== -1){
                         map_ben.push(item.beneficiary.user);
-                        promises.push(getLocation(item.beneficiary.user,"beneficiary"));
+                        promises.push(getLocation(item.beneficiary.user,"beneficiary",item.status,item.beneficiary_contact_person));
                     }
                 }
                 if(map_don.indexOf(item.offer.donor)== -1){
                     map_don.push(item.offer.donor);
                     promises.push(
-                        getLocation(item.offer.donor,"donor"));
+                        getLocation(item.offer.donor,"donor",item.status,item.offer.name));
                     }
+                if( item.status>=3){
+                    createLine(item.beneficiary.user, item.offer.donor,item.id);
+                }
+                
             });
             $q.all(promises).then(function(){
-                
                 angular.extend($scope, {
-                    markers: map_points
+                    markers: map_points,
+                    paths: lines
                 });
             })
         }

@@ -71,6 +71,11 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
     def statusChangeActions(self):
         status = self.request.data.get('status',-1)
         beneficiary_id = self.request.data.get('beneficiary',-1)
+        
+        
+        #TemporalMatching id 
+        temp_matching_id = self.request.data.get('id',-1)
+        
         if status == 2:
             print "process waiting"
             self.sendEmailToBeneficiary(beneficiary_id)
