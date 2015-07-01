@@ -5,7 +5,7 @@
 {% block content %}
 <div id="content-main">
 <h1>{% trans 'Confirm transaction' %}</h1>
-<form action="{% url 'confirm_offer' beneficiary.id %}" method="post">{% csrf_token %}
+<form action="{% url 'confirm_offer' offer_id hash %}" method="post">{% csrf_token %}
 
     {{ form.as_p }}
 

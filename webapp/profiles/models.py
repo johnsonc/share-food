@@ -43,6 +43,14 @@ class Organization(models.Model):
         return self.name
 
 
+def update_email(sender, instance, created, raw, using, update_fields, **kwargs):
+    if not created or instance.user is not None:
+        instance.user.email = instance.email
+        instance.user.save()
+
+post_save.connect(update_email, sender=Organization)
+
+
 class Profile(models.Model):
     DEFAULT_ORGANIZATION_NAME = 'Individual'
 
@@ -70,13 +78,22 @@ class Profile(models.Model):
 
 
 def create_defaults(sender, instance, created, raw, using, update_fields, **kwargs):
-    if not created or instance.profile is None:
+    if not created:
         return
-
+    
     from django.contrib.auth.models import Permission, Group
     from django.contrib.contenttypes.models import ContentType
 
-    profile = instance.profile
+    try:
+        profile = instance.profile
+    except Exception:
+        profile = Profile(user=instance,
+                          default_mass_unit='kg',
+                          donor=False,
+                          beneficiary=False,
+                          driver=False,
+                          operator=False)
+        instance.profile.save()
 
     if profile.donor:
         instance.groups = [Group.objects.get(name='Donor')]
@@ -102,7 +119,21 @@ def create_defaults(sender, instance, created, raw, using, update_fields, **kwar
             user=instance
         )
         beny.save()
-    instance.email = instance.organization.email
+
+    try:
+        instance.email = instance.organization.email
+    except Exception:
+        instance.organization = Organization(name='Noname',
+                                             address='',
+                                             first_name='',
+                                             last_name='',
+                                             tel_1='',
+                                             email='',
+                                             default_mass_unit='kg',
+                                             user=instance)
+        instance.organization.save()
+
+
     instance.is_staff = True
     instance.save()
 

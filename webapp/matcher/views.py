@@ -31,12 +31,12 @@ def driver_shedule(request, routing_id=None):
 
 
 class MatchConfirm(forms.Form):
-    beneficiary = forms.IntegerField(widget=forms.HiddenInput())
+    hash = forms.IntegerField(widget=forms.HiddenInput())
+    offer_id = forms.IntegerField(widget=forms.HiddenInput())
 
-@login_required()
-def confirm_offer(request, beneficiary_id):
+
+def confirm_offer(request, offer_id, hash):
     from django.shortcuts import get_object_or_404
-    from beneficiary.models import Beneficiary
 
     if request.method == 'POST':
         form = MatchConfirm(request.POST)
@@ -44,13 +44,10 @@ def confirm_offer(request, beneficiary_id):
             # TODO set status
             return HttpResponseRedirect(reverse('admin:index'))
     else:
-        form = MatchConfirm(initial={'beneficiary': beneficiary_id})
-        form.beneficiary = beneficiary_id
+        form = MatchConfirm(initial={'offer_id': offer_id, 'hash': hash})
 
-    # todo Form! chyba ModelForm
     return render_to_response('admin/matcher/confirm_offer.html',
-                              {'beneficiary': get_object_or_404(Beneficiary, pk=beneficiary_id),
-                               'form': form},
+                              {'form': form, 'offer_id': offer_id, 'hash': hash},
                               context_instance=RequestContext(request))
 
 
