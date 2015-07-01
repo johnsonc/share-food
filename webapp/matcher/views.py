@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
-from .models import VisitPoint
+from .models import VisitPoint, TemporalMatching
 
 
 @login_required()
@@ -41,13 +41,19 @@ def confirm_offer(request, offer_id, hash):
     if request.method == 'POST':
         form = MatchConfirm(request.POST)
         if form.is_valid():
-            # TODO set status
+            match = TemporalMatching.objects.get(id=offer_id)
+            match.status = 3#confirmed
+            match.save()
             return HttpResponseRedirect(reverse('admin:index'))
     else:
+        match = TemporalMatching.objects.get(id=offer_id)
         form = MatchConfirm(initial={'offer_id': offer_id, 'hash': hash})
 
     return render_to_response('admin/matcher/confirm_offer.html',
-                              {'form': form, 'offer_id': offer_id, 'hash': hash},
+                              {'form': form,
+                               'offer_id': offer_id,
+                               'match': match,
+                               'hash': hash},
                               context_instance=RequestContext(request))
 
 

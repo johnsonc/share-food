@@ -4,7 +4,7 @@ Hi there,
 
 We've got an offer for you!
 
-Check details on:{% endblocktrans %} http://{{ current_site }}{% url 'confirm_offer' beneficiary.id %}
+Check details on:{% endblocktrans %} http://{{ current_site }}{% url 'confirm_offer' match.id match.hash %}
 {% blocktrans %}
 Cheers,
 

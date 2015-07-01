@@ -41,8 +41,8 @@ class TemporalMatching(models.Model):
     date = models.DateField()
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
-    status = models.PositiveSmallIntegerField( max_length=1, choices = STATUS_OPTS )
-    driver = models.ForeignKey(User, null=True, blank=True, default = None)
+    status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS )
+    driver = models.ForeignKey(User, null=True, blank=True, default=None)
     hash = models.IntegerField(blank=True, null=True)
 
     class Meta:

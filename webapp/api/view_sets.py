@@ -73,14 +73,14 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
     def statusChangeActions(self):
 
         status = self.request.data.get('status',-1)
-        beneficiary_id = self.request.data.get('beneficiary',-1)
+        beneficiary_id = self.request.data.get('beneficiary', -1)
 
         #TemporalMatching id
-        temp_matching_id = self.request.data.get('id',-1)
+        temp_matching_id = self.request.data.get('id', -1)
 
         if status == 2:
             print "process waiting"
-            self.sendEmailToBeneficiary(beneficiary_id)
+            self.sendEmailToBeneficiary(beneficiary_id, temp_matching_id)
         elif status == 3:
             print "process confirmed"
         elif status == 4:
@@ -94,17 +94,22 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
         self.statusChangeActions()
         serializer.save()
     
-    def sendEmailToBeneficiary(self, beneficiary_id):
+    def sendEmailToBeneficiary(self, beneficiary_id, temporal_matching_id):
         if beneficiary_id < 0:
             return
+        print 'XXXX'
+        print beneficiary_id
+        print temporal_matching_id
 
         from django.conf import settings
         if "pinax.notifications" not in settings.INSTALLED_APPS:
             return
         from pinax.notifications import models as notification
-        match = TemporalMatching.objects.get(id=beneficiary_id)
-
-        notification.send([match.beneficiary.user], "offer_to_beneficiary", {'beneficiary': match.beneficiary})
+        print 'YYY'
+        match = TemporalMatching.objects.get(id=temporal_matching_id)
+        print match
+        print match.beneficiary.user
+        notification.send([match.beneficiary.user], "offer_to_beneficiary", {'match': match})
 
 
 router.register(r'temporal_matching_simple', TempMatchSimpleViewSet)
