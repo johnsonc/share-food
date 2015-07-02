@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
+from datetime import datetime
+from django.db.models.signals import post_save
 
 
 class Driver(models.Model):
@@ -27,13 +29,24 @@ class Routing(models.Model):
 
 
 class TemporalMatching(models.Model):
+    STATUS_PENDING = 1
+    STATUS_WAITING = 2
+    STATUS_CONFIRMED = 3
+    STATUS_ACCEPTED = 4
+    STATUS_ASSIGNED = 5
+    STATUS_NOTIFIED = 6
+    STATUS_EXPIRED = 7
+    STATUS_CANCELED = 8
+
     STATUS_OPTS = (
-        (1, _("pending")),
-        (2, _("waiting")),
-        (3, _("confirmed")),
-        (4, _("accepted")),
-        (5, _("assigned")),
-        (6, _("notified"))
+        (STATUS_PENDING, _("pending")),
+        (STATUS_WAITING, _("waiting")),
+        (STATUS_CONFIRMED, _("confirmed")),
+        (STATUS_ACCEPTED, _("accepted")),
+        (STATUS_ASSIGNED, _("assigned")),
+        (STATUS_NOTIFIED, _("notified")),
+        (STATUS_EXPIRED, _("expired")),
+        (STATUS_CANCELED, _("canceled"))
     )
     
     offer = models.ForeignKey('donor.Offer')
@@ -41,20 +54,31 @@ class TemporalMatching(models.Model):
     date = models.DateField()
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
-    status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS )
+    status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS)
     driver = models.ForeignKey(User, null=True, blank=True, default=None)
     hash = models.IntegerField(blank=True, null=True)
+    confirmed_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         verbose_name = _('Temporal match')
         verbose_name_plural = _('Temporal matchings')
 
     def send_offer(self):
-        self.status = 2
+        self.status = TemporalMatching.STATUS_WAITING
 
     def offer_accepted(self, hash):
         if hash == self.hash:
-            self.status = 4
+            self.status = TemporalMatching.STATUS_ACCEPTED
+
+
+def update_confirmed_date(sender, instance, created, raw, using, update_fields, **kwargs):
+    if created or 'status' not in update_fields:
+        return
+    if instance.status == TemporalMatching.STATUS_CONFIRMED:
+        instance.confirmed_at = datetime.now()
+        instance.save()
+
+post_save.connect(update_confirmed_date, sender=TemporalMatching)
 
 
 class VisitPoint(models.Model):
