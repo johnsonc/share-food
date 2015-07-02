@@ -8,8 +8,7 @@ from api.view_sets import router
 
 urlpatterns = patterns('',
 
-    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages':'django.conf'}), 
-    url(r'^admin/matcher_panel/$', 'matcher.views.matcher_panel'),                   
+    url(r'^jsi18n/$', 'django.views.i18n.javascript_catalog', {'packages': 'django.conf'}),
     url(r'^admin/', include(site.urls), name="admin"),
     url(r'^schedule/', include('matcher.urls')),
     url(r'^api/', include(router.urls, namespace='api')),

@@ -46,7 +46,7 @@
         {% endif %}
 
         {% if user.is_superuser or user.profile.operator %}
-            <li role="presentation"><a href="/admin/matcher_panel/">{% trans 'Matcher'%}</a></li>
+            <li role="presentation"><a href="{% url 'matcher_panel' %}">{% trans 'Matcher'%}</a></li>
         {% endif %}
 
     {% endif %}

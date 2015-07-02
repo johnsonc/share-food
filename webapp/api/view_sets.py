@@ -72,7 +72,7 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
 
     def statusChangeActions(self):
 
-        status = self.request.data.get('status',-1)
+        status = self.request.data.get('status', -1)
         beneficiary_id = self.request.data.get('beneficiary', -1)
 
         #TemporalMatching id
@@ -80,7 +80,7 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
 
         if status == 2:
             print "process waiting"
-            self.sendEmailToBeneficiary(beneficiary_id, temp_matching_id)
+            self.send_email_to_beneficiary(beneficiary_id, temp_matching_id)
         elif status == 3:
             print "process confirmed"
         elif status == 4:
@@ -89,27 +89,40 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
             print "process assigned"
         elif status == 6:
             print "process notified"
+            self.notify_all(temp_matching_id)
     
     def perform_update(self, serializer):
         self.statusChangeActions()
         serializer.save()
-    
-    def sendEmailToBeneficiary(self, beneficiary_id, temporal_matching_id):
-        if beneficiary_id < 0:
-            return
-        print 'XXXX'
-        print beneficiary_id
-        print temporal_matching_id
 
+    def __send_notification(self, to, ntype, match):
         from django.conf import settings
         if "pinax.notifications" not in settings.INSTALLED_APPS:
             return
         from pinax.notifications import models as notification
-        print 'YYY'
+
+        notification.send(to, ntype, {'match': match})
+
+    def send_email_to_beneficiary(self, beneficiary_id, temporal_matching_id):
+        if temporal_matching_id < 0:
+            return
+
         match = TemporalMatching.objects.get(id=temporal_matching_id)
-        print match
-        print match.beneficiary.user
-        notification.send([match.beneficiary.user], "offer_to_beneficiary", {'match': match})
+        self.__send_notification([match.beneficiary.user],
+                                "offer_to_beneficiary",
+                                match)
+
+    def notify_all(self, temporal_matching_id):
+        if temporal_matching_id < 0:
+            return
+
+        match = TemporalMatching.objects.get(id=temporal_matching_id)
+        self.__send_notification([match.beneficiary.user, match.offer.donor],
+                                "transaction_notify",
+                                match)
+
+
+
 
 
 router.register(r'temporal_matching_simple', TempMatchSimpleViewSet)

@@ -59,6 +59,7 @@ class Offer(models.Model):
 def process_new_offer(sender, instance, created, **kwargs):
     from matcher.matcher import match_offers_to_beneficiaries
     match_offers_to_beneficiaries(instance, date.today(), 7)
+
 post_save.connect(process_new_offer, sender=Offer)
 
 

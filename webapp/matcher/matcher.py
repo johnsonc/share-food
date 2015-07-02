@@ -79,22 +79,14 @@ def match_offers_to_beneficiaries(offer, start_date, delta=0):
 
 def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
     # TODO maybe we should check if beneficiary is for today
-    print '---'
     for d in range(delta+1):
-        print d
         day = start_date + timedelta(days=d)
-        print day
         existing_matches = find_existing_matches_for(day)
-        print len(existing_matches)
         offers_for_day = find_offers_for(day)
-        print len(offers_for_day)
         for offer in offers_for_day:
-            print '%d-%d' % (offer.id, beneficiary.id)
             if '%d-%d' % (offer.id, beneficiary.id) in existing_matches:
                 continue
-            print 'gogo'
             if match(offer, beneficiary):
-                print 'match!'
                 tm = TemporalMatching(
                         offer=offer,
                         beneficiary=beneficiary,
