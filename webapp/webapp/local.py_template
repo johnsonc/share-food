@@ -1,0 +1,35 @@
+author = 'piotr'
+
+DEBUG = True
+
+SITE_ID = 1
+
+TEMPLATE_DIRS = ('PATH_TO_PROJECT/share-food/webapp/webapp/templates/',)
+
+STATICFILES_DIRS=('PATH_TO_PROJECT/share-food/webapp/webapp/static/',)
+
+DATABASES = {
+    'default':{
+        'ENGINE':'django.contrib.gis.db.backends.postgis',
+        'NAME': 'food',
+        'USER': 'postgres',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
+    }
+}
+
+EMAIL_BACKEND = 'django.core.email.backends.smtp.EmailBackend'
+# email configuration
+
+EMAIL_HOST = 'mail.recoded.co'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'notification@recoded.co'
+EMAIL_HOST_PASSWORD = 'V6ge5k4s'
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = 'Food <notification@recoded.co>'
+
+NOTIFICATION_QUEUE_ALL = True
+PINAX_NOTIFICATIONS_BACKENDS = [
+    ("email", "pinax.notifications.backends.email.EmailBackend"),
+]
