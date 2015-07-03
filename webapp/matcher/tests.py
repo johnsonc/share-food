@@ -384,8 +384,7 @@ class TestCheckTemporalMatches(TestCase):
     def test_searching(self):
         from donor.models import process_new_offer
         from beneficiary.models import process_new_beneficiary
-        from .matcher import check_temporal_matches
-        from .matcher import find_temporal_matches_to_cancel
+        from .matcher import check_temporal_matches, find_temporal_matches_to_check
         from random import randint
 
         # ???
@@ -400,7 +399,7 @@ class TestCheckTemporalMatches(TestCase):
 
         # new offerts
         offerts = []
-        for n in range(15):
+        for n in range(10):
             tmp_offer = mommy.make(Offer, donor=self.user1, food_category=self.category0, date=date.today()+timedelta(days = randint(0, 10)))
             tmp_offer.beneficiary_group.add(self.group0)
             tmp_offer.save()
@@ -408,16 +407,18 @@ class TestCheckTemporalMatches(TestCase):
 
         mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday()+1)
 
-        helper = 0 # jak to ładniej w Pythonie?
+        mins = 0
         for offert in offerts:
-            tmp_matching = mommy.make(TemporalMatching, offer=offert, beneficiary=beneficiary0, date=date.today(), status=helper%5)
+            tmp_matching = mommy.make(TemporalMatching, offer=offert, beneficiary=beneficiary0, date=date.today(), status=3)
+            tmp_matching.waiting_since = datetime.now()-timedelta(minutes=mins)
             tmp_matching.save()
-            helper += 1
+            mins+=20
 
-        after_check = check_temporal_matches()
-        temporal_matches = find_temporal_matches_to_cancel()
-        print str(after_check) + " / " + str(len(temporal_matches))
-        self.assertEqual(len(temporal_matches), after_check)
+        self.assertEqual(len(find_temporal_matches_to_check()),10)
+
+        check_temporal_matches()
+
+        self.assertEqual(len(find_temporal_matches_to_check()),3)
 
         #co to jest?
         post_save.connect(process_new_offer, sender=Offer)

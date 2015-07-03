@@ -105,35 +105,25 @@ def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
                 )
                 tm.save()
 
-# przerost formy nad trescia czy oczekiwany format???
-def find_temporal_matches_to_cancel():
-    temp_matches = TemporalMatching.objects.filter(date=date.today(), status=4)
+
+def find_temporal_matches_to_check():
+
+    time_range = datetime.now() - timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME_RANGE)
+    temp_matches = TemporalMatching.objects.filter(waiting_since__gte=time_range, status = TemporalMatching.STATUS_CONFIRMED )
+
     return temp_matches
 
 def check_temporal_matches():
 
-    temp_matches = find_temporal_matches_to_cancel()
+        temp_matches = find_temporal_matches_to_check()
 
-    counter = 0
-    for temp_match in temp_matches:
-        #nie ma confirmed_at
-        random_confirmed_at = datetime.now() - timedelta(hours=random.randint(0, 1))
-        actualTime = datetime.now()
-        diffrence = actualTime - random_confirmed_at
+        max_waiting = timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME)
 
-        if (diffrence>timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME)):
-           temp_match.status = 1 #nie ma cancelled
-           temp_match.save()
-           counter+=1
+        for temp_match in temp_matches:
 
-    #alternatywna z confirmed_at
-    # temp_matches = find_temporal_matches_to_cancel()
-    # for temp_match in  temp_matches:
-    #     if (datetime.now() - temp_match.confirmed_at)>timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME):
-    #         temp_match.status = 0;
-    #         temp_match.update()
-
-    return (len(temp_matches)-counter)
-
-
+             if (datetime.now() - temp_match.waiting_since.replace(tzinfo=None)) > max_waiting :
+                print datetime.now()
+                print temp_match.waiting_since
+                temp_match.status = TemporalMatching.STATUS_CANCELED
+                temp_match.save()
 

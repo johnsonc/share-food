@@ -72,7 +72,7 @@ class TemporalMatching(models.Model):
 
 
 def update_confirmed_date(sender, instance, created, raw, using, update_fields, **kwargs):
-    if created or 'status' not in update_fields:
+    if created  or (update_fields and 'status' not in update_fields):
         return
     if instance.status == TemporalMatching.STATUS_WAITING:
         instance.waiting_since = datetime.now()
