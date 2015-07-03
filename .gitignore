@@ -2,3 +2,6 @@
 **/local.py
 node_modules/
 bower_components/
+newenv/
+.idea/
+
