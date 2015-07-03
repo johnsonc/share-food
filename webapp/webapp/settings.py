@@ -49,7 +49,7 @@ INSTALLED_APPS = (
     'matcher',
     'dictionaries',
     'api',
-    'webapp',   
+    'webapp',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -71,7 +71,7 @@ ROOT_URLCONF = 'webapp.urls'
 
 WSGI_APPLICATION = 'webapp.wsgi.application'
 
-
+CONFIRMATION_EXPIRE_TIME = 1
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 

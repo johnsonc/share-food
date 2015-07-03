@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
-
+#import datetime
 
 class Driver(models.Model):
     user = models.ForeignKey(User)
@@ -28,6 +28,7 @@ class Routing(models.Model):
 
 class TemporalMatching(models.Model):
     STATUS_OPTS = (
+        #(0, _("canceled")),
         (1, _("pending")),
         (2, _("waiting")),
         (3, _("confirmed")),
@@ -44,6 +45,7 @@ class TemporalMatching(models.Model):
     status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS )
     driver = models.ForeignKey(User, null=True, blank=True, default=None)
     hash = models.IntegerField(blank=True, null=True)
+    #confirmed_at = models.DateTimeField()
 
     class Meta:
         verbose_name = _('Temporal match')
@@ -55,6 +57,7 @@ class TemporalMatching(models.Model):
     def offer_accepted(self, hash):
         if hash == self.hash:
             self.status = 4
+            #self.confirmed_at = datetime.now()
 
 
 class VisitPoint(models.Model):

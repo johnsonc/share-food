@@ -6,6 +6,7 @@ from .models import TemporalMatching
 from datetime import datetime, timedelta, date
 import logging
 import random
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -98,3 +99,36 @@ def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
                         hash=random.randint(1000, 1000000)
                 )
                 tm.save()
+
+# przerost formy nad trescia czy oczekiwany format???
+def find_temporal_matches_to_cancel():
+    temp_matches = TemporalMatching.objects.filter(date=date.today(), status=4)
+    return temp_matches
+
+def check_temporal_matches():
+
+    temp_matches = find_temporal_matches_to_cancel()
+
+    counter = 0
+    for temp_match in temp_matches:
+        #nie ma confirmed_at
+        random_confirmed_at = datetime.now() - timedelta(hours=random.randint(0, 1))
+        actualTime = datetime.now()
+        diffrence = actualTime - random_confirmed_at
+
+        if (diffrence>timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME)):
+           temp_match.status = 1 #nie ma cancelled
+           temp_match.save()
+           counter+=1
+
+    #alternatywna z confirmed_at
+    # temp_matches = find_temporal_matches_to_cancel()
+    # for temp_match in  temp_matches:
+    #     if (datetime.now() - temp_match.confirmed_at)>timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME):
+    #         temp_match.status = 0;
+    #         temp_match.update()
+
+    return (len(temp_matches)-counter)
+
+
+
