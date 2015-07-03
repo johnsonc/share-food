@@ -57,7 +57,7 @@ class TemporalMatching(models.Model):
     status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS)
     driver = models.ForeignKey(User, null=True, blank=True, default=None)
     hash = models.IntegerField(blank=True, null=True)
-    confirmed_at = models.DateTimeField(blank=True, null=True)
+    waiting_since = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         verbose_name = _('Temporal match')
@@ -74,8 +74,8 @@ class TemporalMatching(models.Model):
 def update_confirmed_date(sender, instance, created, raw, using, update_fields, **kwargs):
     if created or 'status' not in update_fields:
         return
-    if instance.status == TemporalMatching.STATUS_CONFIRMED:
-        instance.confirmed_at = datetime.now()
+    if instance.status == TemporalMatching.STATUS_WAITING:
+        instance.waiting_since = datetime.now()
         instance.save()
 
 post_save.connect(update_confirmed_date, sender=TemporalMatching)

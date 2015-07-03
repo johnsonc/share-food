@@ -1,1 +1,1 @@
-{% load i18n %}{% blocktrans %} New offer found!{% endblocktrans %}
+{% load i18n %}{% blocktrans %} New offer found{% endblocktrans %}

@@ -10,7 +10,7 @@
     {{ form.as_p }}
     <br />
     <div class="module aligned form-row field-date">
-        <h1>{% trans 'Donor' %} {{ match.offer.donor.username }}</h1>
+        <h1>{% trans 'Donation' %}</h1>
         <ul>
             <li>{% trans 'Delivery name' %}: {{ match.offer.name }}</li>
             <li>{% trans 'Food category' %}: {{ match.offer.food_category }}</li>
@@ -22,25 +22,6 @@
             <li>{% trans 'Pick up address' %}: {{ match.offer.address }}</li>
         </ul>
         <p>{% trans 'Driver info' %}: {{ match.offer.driver_info }}</p>
-    </div>
-    <div class="module aligned form-row field-date">
-        <h1>{% trans 'Beneficiary' %} {{ match.beneficiary.user.username }}</h1>
-        <ul>
-            <li>{% trans 'Estimated mass' %}: {{ match.quantity }}</li>
-            <li>{% trans 'Contact person' %}: {{ match.beneficiary.beneficiary_contact_person }}</li>
-            <li>{% trans 'Pick up address' %}: {{ match.beneficiary.user.organization.address }}</li>
-            <li>{% trans 'Delivery time windows' %}:
-                <ul>
-                {% for tw in match.beneficiary.deliveries.all %}
-                    <li>{% trans 'From' %} {{ tw.time_from }}
-                                                   {% trans 'to' %} {{ tw.time_to }}
-                                                    {% if tw.day_of_week %}
-                                                        {% trans 'every' %} {{ tw.day_of_week }}
-                                                   {% endif %}</li>
-                {% endfor %}
-                </ul>
-            </li>
-        </ul>
     </div>
 
     <div class="submit-row">
