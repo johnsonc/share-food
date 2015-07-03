@@ -1,6 +1,14 @@
-{% load i18n %}{% url "notification_notices" as notices_url %}{% blocktrans %}You have received the following notice from {{ current_site }}:
+{% load i18n %}{% url "notification_notices" as notices_url %}
+
+{% comment %}
+    TODO add details about transaction:
+        - date
+        - offer name, food_category
+        - offer address, donor driver info
+
+        - beneficiary name,
+        -
+{% endcomment %}
 
 Notify: {{ message }}
 
-To see other notices or change how you receive notifications, please go to {{ default_http_protocol }}://{{ current_site }}{{ notices_url }}
-{% endblocktrans %}

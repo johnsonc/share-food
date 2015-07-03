@@ -11,6 +11,11 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
+def cancel_temporal_match(temporalmatching):
+    # TODO implement this!
+    pass
+
+
 def find_offers_for(date):
     logger.info("find_offers_for:%s" % str(date))
     offers_for_today = set()

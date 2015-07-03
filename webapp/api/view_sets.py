@@ -103,7 +103,15 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
 
         notification.send(to, ntype, {'match': match})
 
+    def notify_beneficiaries_about_offer(self, temporal_matchings_ids=[]):
+        matches = TemporalMatching.objects.filter(id__in=temporal_matchings_ids)
+        for match in matches:
+            self.__send_notification([match.beneficiary.user],
+                                "offer_to_beneficiary",
+                                match)
+
     def send_email_to_beneficiary(self, beneficiary_id, temporal_matching_id):
+        """ TODO: remove after switching to notify_beneficiaries_about_offer"""
         if temporal_matching_id < 0:
             return
 
