@@ -225,9 +225,9 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
         });
     }
     
-    $scope.assignDriver = function(items){
+    $scope.assignDriver = function(items, driver){
         angular.forEach(items, function(item){
-            $scope.changeStatus(item,5,item.driver);
+            $scope.changeStatus(item,5,driver);
         });
     }
     
@@ -294,7 +294,6 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     }
     
     $scope.changeStatus = function(item,status,driver){
-    
         if(item.beneficiary.checked && item.beneficiary.checked == true){
             var temp = {
                     "id": item.id,

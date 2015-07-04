@@ -18,6 +18,7 @@ import logging
 logger = logging.getLogger(__name__)
 router = routers.DefaultRouter()
 
+
 class OfferViewSet(viewsets.ModelViewSet):
     """
     A viewset for viewing and editing user instances.
@@ -75,7 +76,6 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
         status = self.request.data.get('status', -1)
         beneficiary_id = self.request.data.get('beneficiary', -1)
 
-        #TemporalMatching id
         temp_matching_id = self.request.data.get('id', -1)
 
         if status == 2:
@@ -87,6 +87,7 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
             print "process accepted"
         elif status == 5:
             print "process assigned"
+            print self.request.data
         elif status == 6:
             print "process notified"
             self.notify_all(temp_matching_id)

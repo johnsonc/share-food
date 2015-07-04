@@ -10,8 +10,13 @@ from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.conf import settings
 from .models import VisitPoint, TemporalMatching
 
+if "pinax.notifications" in settings.INSTALLED_APPS:
+    from pinax.notifications import models as notification
+else:
+    notification = None
 
 @staff_member_required
 def matcher_panel(request):
@@ -58,7 +63,7 @@ def confirm_offer(request, offer_id, secret):
         if form.is_valid():
 
             if form.cleaned_data['confirm'] == MatchConfirm.MATCH_REJECT:
-                match.status = TemporalMatching.STATUS_CANCELED
+                match.status = TemporalMatching.STATUS_EXPIRED
                 from .matcher import cancel_temporal_match
                 cancel_temporal_match(match)
 
@@ -71,7 +76,14 @@ def confirm_offer(request, offer_id, secret):
                 match.status = TemporalMatching.STATUS_CONFIRMED
 
             match.save()
-            return HttpResponseRedirect(reverse('admin:index'))
+            if notification:
+                notification.send([match.beneficiary.user],
+                                  "offer_confirmation_thank_you",
+                                  {})
+
+            return render_to_response('admin/matcher/confirm_offer_thank_you.html',
+                                      {'match': match},
+                                      context_instance=RequestContext(request))
     else:
 
         form = MatchConfirm(initial={'offer_id': offer_id, 'hash': secret})
@@ -81,7 +93,7 @@ def confirm_offer(request, offer_id, secret):
                                'offer_id': offer_id,
                                'match': match,
                                'hash': secret},
-                              context_instance=RequestContext(request))
+                               context_instance=RequestContext(request))
 
 
 @login_required()

@@ -8,8 +8,13 @@ from django.utils import timezone
 import logging
 import random
 from django.conf import settings
-
+from django.conf import settings
 logger = logging.getLogger(__name__)
+
+if "pinax.notifications" in settings.INSTALLED_APPS:
+    from pinax.notifications import models as notification
+else:
+    notification = None
 
 
 def cancel_temporal_match(temporalmatching):
@@ -113,7 +118,11 @@ def find_temporal_matches_to_check():
 def check_temporal_matches():
     temp_matches = find_temporal_matches_to_check()
     for temp_match in temp_matches:
-        temp_match.status = TemporalMatching.STATUS_CANCELED
+        temp_match.status = TemporalMatching.STATUS_EXPIRED
         cancel_temporal_match(temp_match)
         temp_match.save()
+
+    if notification:
+        notification.send([tm.beneficiary.user for tm in temp_matches],
+                          "transaction_timeout", {})
 

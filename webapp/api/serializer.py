@@ -34,21 +34,22 @@ class BeneficiaryGroupSerializer(serializers.ModelSerializer):
 
         
 class BeneficiarySerializer(serializers.ModelSerializer):
-    group =  BeneficiaryGroupSerializer()
+    group = BeneficiaryGroupSerializer()
     
     class Meta:
         model = Beneficiary
-        fields = ('id', 'group' ,'num_meals', 'frozen_capacity', 'drystorage_capacity', 'refrigerated_capacity', 'preference_info', 'last_delivery', 'user')
+        fields = ('id', 'group','num_meals', 'frozen_capacity', 'drystorage_capacity', 'refrigerated_capacity', 'preference_info', 'last_delivery', 'user')
         
 
 class TemporalMatchingSerializer(serializers.ModelSerializer):
     offer = OfferSerializer()
     beneficiary = BeneficiarySerializer()
-    
+    driver = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = TemporalMatching
         depth = 2
-        fields = ('id', 'offer' ,'beneficiary', 'status', 'quantity','date','beneficiary_contact_person')
+        fields = ('id', 'offer', 'beneficiary', 'status', 'quantity', 'date', 'beneficiary_contact_person', 'driver')
    
 
 class TemporalMatchingSimpleSerializer(serializers.ModelSerializer):

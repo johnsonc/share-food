@@ -43,8 +43,6 @@ class TemporalMatching(models.Model):
     STATUS_ASSIGNED = 5
     STATUS_NOTIFIED = 6
     STATUS_EXPIRED = 7
-    STATUS_CANCELED = 8
-    STATUS_TOOLATE = 9
 
     STATUS_OPTS = (
         (STATUS_PENDING, _("pending")),
@@ -54,8 +52,6 @@ class TemporalMatching(models.Model):
         (STATUS_ASSIGNED, _("assigned")),
         (STATUS_NOTIFIED, _("notified")),
         (STATUS_EXPIRED, _("expired")),
-        (STATUS_CANCELED, _("canceled")),
-        (STATUS_TOOLATE, _("too late"))
     )
     
     offer = models.ForeignKey('donor.Offer')
@@ -124,7 +120,7 @@ def check_quantity(sender, instance, **kwargs):
                                                     status__in=[TemporalMatching.STATUS_PENDING,
                                                                 TemporalMatching.STATUS_WAITING]).exclude(id=instance.id)
         for tm in to_cancel:
-            tm.status = TemporalMatching.STATUS_TOOLATE
+            tm.status = TemporalMatching.STATUS_EXPIRED
             tm.save()
 
 

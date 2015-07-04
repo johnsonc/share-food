@@ -71,8 +71,7 @@ ROOT_URLCONF = 'webapp.urls'
 
 WSGI_APPLICATION = 'webapp.wsgi.application'
 
-CONFIRMATION_EXPIRE_TIME = 1
-CONFIRMATION_EXPIRE_TIME_RANGE = 4
+CONFIRMATION_EXPIRE_TIME_RANGE = 2
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 

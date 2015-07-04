@@ -206,7 +206,7 @@
 
                                       <tr ng-repeat="item in drivers">
                                           <th><input type="radio" name="driver" 
-                                                  ng-model="$parent.picked" 
+                                                  ng-model="$parent.picked"
                                                   ng-change="beneficiaryChanged(items)" value="[[item.id]]"></th>
                                           <th>[[item.id]]</th>
                                           <th>[[item.username]]</th>
@@ -263,7 +263,7 @@
                       <button type="button" class="btn btn-default" 
                           ng-click="accept(items)" ng-disabled="acceptChecked">{% trans "Accept"%}</button>
                       <button type="button" class="btn btn-default" 
-                          ng-click="assignDriver(items)" ng-disabled="assignDriverChecked">{% trans "Assign driver"%}</button>
+                          ng-click="assignDriver(items, picked)" ng-disabled="assignDriverChecked">{% trans "Assign driver"%}</button>
                       <button type="button" class="btn btn-default" 
                           ng-click="notify(items)" ng-disabled="notifyChecked">{% trans "Notify"%}</button>
                       <button type="button" class="btn btn-default" 
