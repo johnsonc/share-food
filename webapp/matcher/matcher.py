@@ -107,7 +107,7 @@ def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
 
 def find_temporal_matches_to_check():
     time_range = timezone.now() - timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME_RANGE)
-    return TemporalMatching.objects.filter(waiting_since__gte=time_range, status=TemporalMatching.STATUS_WAITING)
+    return TemporalMatching.objects.filter(waiting_since__lte=time_range, status=TemporalMatching.STATUS_WAITING)
 
 
 def check_temporal_matches():

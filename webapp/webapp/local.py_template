@@ -33,3 +33,5 @@ NOTIFICATION_QUEUE_ALL = True
 PINAX_NOTIFICATIONS_BACKENDS = [
     ("email", "pinax.notifications.backends.email.EmailBackend"),
 ]
+
+CONFIRMATION_EXPIRE_TIME_RANGE = 2
