@@ -6,6 +6,7 @@ from .models import TemporalMatching
 from datetime import datetime, timedelta, date
 import logging
 import random
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -103,3 +104,26 @@ def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
                         hash=random.randint(1000, 1000000)
                 )
                 tm.save()
+
+
+def find_temporal_matches_to_check():
+
+    time_range = datetime.now() - timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME_RANGE)
+    temp_matches = TemporalMatching.objects.filter(waiting_since__gte=time_range, status = TemporalMatching.STATUS_CONFIRMED )
+
+    return temp_matches
+
+def check_temporal_matches():
+
+        temp_matches = find_temporal_matches_to_check()
+
+        max_waiting = timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME)
+
+        for temp_match in temp_matches:
+
+             if (datetime.now() - temp_match.waiting_since.replace(tzinfo=None)) > max_waiting :
+                print datetime.now()
+                print temp_match.waiting_since
+                temp_match.status = TemporalMatching.STATUS_CANCELED
+                temp_match.save()
+

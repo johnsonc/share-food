@@ -24,11 +24,13 @@ from matcher import find_offers_for, find_beneficiaries_for, find_existing_match
 class TestFindOffers(TestCase):
 
     def setUp(self):
+        print "setUp"
         post_save.disconnect(create_defaults, sender=User)
         self.user = mommy.make(User)
         post_save.connect(create_defaults, sender=User)
 
     def test_simple_date(self):
+        print "simple"
         today = date.today()
         mommy.make(Offer, date=today+timedelta(days=1), donor=self.user)
         mommy.make(Offer, date=today+timedelta(days=-1), donor=self.user)
@@ -475,4 +477,56 @@ class TestTemporalMatchCreation(TestCase):
         post_save.connect(process_new_offer, sender=Offer)
         post_save.connect(process_new_beneficiary, sender=Beneficiary)
 
+
+class TestCheckTemporalMatches(TestCase):
+    def setUp(self):
+        post_save.disconnect(create_defaults, sender=User)
+        self.user0 = mommy.make(User)
+        self.user1 = mommy.make(User)
+
+        self.category0 = mommy.make(FoodCategory)
+        self.group0 = mommy.make(BeneficiaryGroup)
+
+    def test_searching(self):
+        from donor.models import process_new_offer
+        from beneficiary.models import process_new_beneficiary
+        from .matcher import check_temporal_matches, find_temporal_matches_to_check
+        from random import randint
+
+        # ???
+        post_save.disconnect(process_new_offer, sender=Offer)
+        post_save.disconnect(process_new_beneficiary, sender=Beneficiary)
+
+        # beneficiary for today
+        beneficiary0 = mommy.make(Beneficiary, user=self.user0, group=self.group0)
+        beneficiary0.food_category.add(self.category0)
+        beneficiary0.save()
+        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday())
+
+        # new offerts
+        offerts = []
+        for n in range(10):
+            tmp_offer = mommy.make(Offer, donor=self.user1, food_category=self.category0, date=date.today()+timedelta(days = randint(0, 10)))
+            tmp_offer.beneficiary_group.add(self.group0)
+            tmp_offer.save()
+            offerts.append(tmp_offer)
+
+        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday()+1)
+
+        mins = 0
+        for offert in offerts:
+            tmp_matching = mommy.make(TemporalMatching, offer=offert, beneficiary=beneficiary0, date=date.today(), status=3)
+            tmp_matching.waiting_since = datetime.now()-timedelta(minutes=mins)
+            tmp_matching.save()
+            mins+=20
+
+        self.assertEqual(len(find_temporal_matches_to_check()),10)
+
+        check_temporal_matches()
+
+        self.assertEqual(len(find_temporal_matches_to_check()),3)
+
+        #co to jest?
+        post_save.connect(process_new_offer, sender=Offer)
+        post_save.connect(process_new_beneficiary, sender=Beneficiary)
 
