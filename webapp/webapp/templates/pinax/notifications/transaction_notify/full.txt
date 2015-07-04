@@ -1,14 +1,6 @@
-{% load i18n %}{% url "notification_notices" as notices_url %}
+Dear Maple Leaf Harvest Beneficiary,
 
-{% comment %}
-    TODO add details about transaction:
-        - date
-        - offer name, food_category
-        - offer address, donor driver info
+Your food donation has been confirmed. Please log in to your profile to see your updated delivery schedule.
 
-        - beneficiary name,
-        -
-{% endcomment %}
-
-Notify: {{ message }}
-
+Regards
+Maple Leaf Harvest Team

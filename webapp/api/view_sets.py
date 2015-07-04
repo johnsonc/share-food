@@ -108,8 +108,8 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
         matches = TemporalMatching.objects.filter(id__in=temporal_matchings_ids)
         for match in matches:
             self.__send_notification([match.beneficiary.user],
-                                "offer_to_beneficiary",
-                                match)
+                                     "offer_to_beneficiary",
+                                     match)
 
     def send_email_to_beneficiary(self, beneficiary_id, temporal_matching_id):
         """ TODO: remove after switching to notify_beneficiaries_about_offer"""
@@ -118,17 +118,17 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
 
         match = TemporalMatching.objects.get(id=temporal_matching_id)
         self.__send_notification([match.beneficiary.user],
-                                "offer_to_beneficiary",
-                                match)
+                                 "offer_to_beneficiary",
+                                 match)
 
     def notify_all(self, temporal_matching_id):
         if temporal_matching_id < 0:
             return
 
         match = TemporalMatching.objects.get(id=temporal_matching_id)
-        self.__send_notification([match.beneficiary.user, match.offer.donor],
-                                "transaction_notify",
-                                match)
+        self.__send_notification([match.beneficiary.user],
+                                 "transaction_notify",
+                                 match)
 
 
 
