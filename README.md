@@ -38,3 +38,9 @@
 
 5. run application
 	python manage.py runserver
+
+
+
+6. crontab configuration
+*/2 * * * * python PATH_TO_THE_APP/manage.py emit_notices
+0 9 * * * python PATH_TO_THE_APP/manage.py check_temporal_matches

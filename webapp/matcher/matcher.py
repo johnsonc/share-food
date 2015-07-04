@@ -39,24 +39,23 @@ def cancel_temporal_match(temporalmatching):
         notification.send(to_notify, 'transaction_canceled', {})
 
 
-
-
-def assign_driver_to_match(driver, temporalmatching):
+def assign_driver_to_match(driver, temporal_matching):
     routing, created = Routing.objects.get_or_create(driver=driver, date=temporalmatching.date)
-    visitpoints = VisitPoint.objects.filter(routing=routing).order_by('-seq_num')
-    seq_num = 0 if len(visitpoints) == 0 else visitpoints[0].seq_num + 1
+    visit_points = VisitPoint.objects.filter(routing=routing).order_by('-seq_num')
+    seq_num = 0 if len(visit_points) == 0 else visit_points[0].seq_num + 1
     start = VisitPoint(seq_num=seq_num,
-                       matched=temporalmatching,
+                       matched=temporal_matching,
                        status=VisitPoint.STATUS_PENDING,
                        donor=True,
                        routing=routing)
     start.save()
     stop = VisitPoint(seq_num=seq_num+1,
-                      matched=temporalmatching,
+                      matched=temporal_matching,
                       status=VisitPoint.STATUS_PENDING,
                       donor=False,
                       routing=routing)
     stop.save()
+
 
 def find_offers_for(date):
     logger.info("find_offers_for:%s" % str(date))
@@ -112,16 +111,14 @@ def match_offers_to_beneficiaries(offer, start_date, delta=0):
             if '%d-%d' % (offer.id, beny.id) in existing_matches:
                 continue
             if match(offer, beny):
-                tm = TemporalMatching(
-                        offer=offer,
-                        beneficiary=beny,
-                        date=day,
-                        beneficiary_contact_person=beny.user.username,
-                        quantity=0,
-                        status=1,#pending
-                        driver=None,
-                        hash=random.randint(1000, 1000000)
-                )
+                tm = TemporalMatching(offer=offer,
+                                      beneficiary=beny,
+                                      date=day,
+                                      beneficiary_contact_person=beny.user.username,
+                                      quantity=0,
+                                      status=TemporalMatching.STATUS_PENDING,
+                                      driver=None,
+                                      hash=random.randint(1000, 1000000))
                 tm.save()
 
 
@@ -140,7 +137,7 @@ def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
                                       date=day,
                                       beneficiary_contact_person=beneficiary.user.username,
                                       quantity=0,
-                                      status=1,#pending
+                                      status=TemporalMatching.STATUS_PENDING,
                                       driver=None,
                                       hash=random.randint(1000, 1000000))
                 tm.save()
@@ -154,9 +151,7 @@ def find_temporal_matches_to_check():
 def check_temporal_matches():
     temp_matches = find_temporal_matches_to_check()
     for temp_match in temp_matches:
-        temp_match.status = TemporalMatching.STATUS_EXPIRED
         cancel_temporal_match(temp_match)
-        temp_match.save()
 
     if notification:
         notification.send([tm.beneficiary.user for tm in temp_matches],

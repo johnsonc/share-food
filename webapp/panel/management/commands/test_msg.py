@@ -15,8 +15,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         people = User.objects.filter(is_superuser=True)
-        print [p.email for p in people]
         if notifications:
-            print 'notification ok'
             beny = Beneficiary.objects.all()[0]
             print notifications.send_now(people, "offer_to_beneficiary", {'beneficiary': beny})
