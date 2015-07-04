@@ -4,6 +4,7 @@ from donor.models import Offer
 from beneficiary.models import Beneficiary
 from .models import TemporalMatching
 from datetime import datetime, timedelta, date
+from django.utils import timezone
 import logging
 import random
 from django.conf import settings
@@ -26,8 +27,8 @@ def find_offers_for(date):
     # days based on repetition
     day_position_in_month = (date.day / 7) + 1
     repetition_offers = Offer.objects.filter(Q(repetitions__day_of_week=date.weekday()) &
-                                            Q(repetitions__date_start__lte=date) &
-                                            Q(repetitions__date_stop__gte=date) &
+                                             Q(repetitions__date_start__lte=date) &
+                                             Q(repetitions__date_stop__gte=date) &
                     (Q(repetitions__day_freq=0) | Q(repetitions__day_freq=day_position_in_month)))
     logger.info("found based on repetitions %d" % len(repetition_offers))
 
@@ -93,37 +94,26 @@ def match_beneficiaries_to_offers(beneficiary, start_date, delta=0):
             if '%d-%d' % (offer.id, beneficiary.id) in existing_matches:
                 continue
             if match(offer, beneficiary):
-                tm = TemporalMatching(
-                        offer=offer,
-                        beneficiary=beneficiary,
-                        date=day,
-                        beneficiary_contact_person=beneficiary.user.username,
-                        quantity=0,
-                        status=1,#pending
-                        driver=None,
-                        hash=random.randint(1000, 1000000)
-                )
+                tm = TemporalMatching(offer=offer,
+                                      beneficiary=beneficiary,
+                                      date=day,
+                                      beneficiary_contact_person=beneficiary.user.username,
+                                      quantity=0,
+                                      status=1,#pending
+                                      driver=None,
+                                      hash=random.randint(1000, 1000000))
                 tm.save()
 
 
 def find_temporal_matches_to_check():
+    time_range = timezone.now() - timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME_RANGE)
+    return TemporalMatching.objects.filter(waiting_since__gte=time_range, status=TemporalMatching.STATUS_WAITING)
 
-    time_range = datetime.now() - timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME_RANGE)
-    temp_matches = TemporalMatching.objects.filter(waiting_since__gte=time_range, status = TemporalMatching.STATUS_CONFIRMED )
-
-    return temp_matches
 
 def check_temporal_matches():
-
-        temp_matches = find_temporal_matches_to_check()
-
-        max_waiting = timedelta(hours=settings.CONFIRMATION_EXPIRE_TIME)
-
-        for temp_match in temp_matches:
-
-             if (datetime.now() - temp_match.waiting_since.replace(tzinfo=None)) > max_waiting :
-                print datetime.now()
-                print temp_match.waiting_since
-                temp_match.status = TemporalMatching.STATUS_CANCELED
-                temp_match.save()
+    temp_matches = find_temporal_matches_to_check()
+    for temp_match in temp_matches:
+        temp_match.status = TemporalMatching.STATUS_CANCELED
+        cancel_temporal_match(temp_match)
+        temp_match.save()
 
