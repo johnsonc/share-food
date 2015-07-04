@@ -7,7 +7,7 @@
 <h1>{% trans 'Confirm transaction' %}</h1>
 <form action="{% url 'confirm_offer' offer_id hash %}" method="post">{% csrf_token %}
 
-    {{ form.as_p }}
+
     <br />
     <div class="module aligned form-row field-date">
         <h1>{% trans 'Donation' %}</h1>
@@ -23,9 +23,12 @@
         </ul>
         <p>{% trans 'Driver info' %}: {{ match.offer.driver_info }}</p>
     </div>
+    <br />
+        {{ form.as_table }}
+
 
     <div class="submit-row">
-        <input type="submit" value="{% trans 'Confirm' %}" class="default" />
+        <input type="submit" value="{% trans 'Submit' %}" style="float:left" class="default" />
     </div>
 
 </form>

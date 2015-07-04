@@ -254,6 +254,112 @@ class TestMatch(TestCase):
         self.assertFalse(match(offer1, beneficiary1))
 
 
+class TestQuantityMonitor(TestCase):
+
+    def setUp(self):
+        post_save.disconnect(create_defaults, sender=User)
+        self.user0 = mommy.make(User)
+        self.user1 = mommy.make(User)
+        self.user2 = mommy.make(User)
+
+        self.category0 = mommy.make(FoodCategory)
+        self.group0 = mommy.make(BeneficiaryGroup)
+
+    def test_quantity_correct_full(self):
+        from donor.models import process_new_offer
+        from beneficiary.models import process_new_beneficiary
+
+        post_save.disconnect(process_new_offer, sender=Offer)
+        post_save.disconnect(process_new_beneficiary, sender=Beneficiary)
+
+        # beneficiary for today
+        beneficiary0 = mommy.make(Beneficiary, user=self.user0, group=self.group0)
+
+        # new offer
+        offer0 = mommy.make(Offer,
+                            estimated_mass=100,
+                            donor=self.user1,
+                            food_category=self.category0,
+                            date=date.today())
+
+        match0 = mommy.make(TemporalMatching,
+                           offer=offer0,
+                           beneficiary=beneficiary0,
+                           date=date.today(),
+                           quantity=0,
+                           status=TemporalMatching.STATUS_PENDING)
+
+        match1 = mommy.make(TemporalMatching,
+                           offer=offer0,
+                           date=date.today(),
+                           quantity=0,
+                           status=TemporalMatching.STATUS_PENDING)
+
+        match0.status = TemporalMatching.STATUS_WAITING
+        match0.save()
+        self.assertIsNotNone(match0.waiting_since)
+
+        match1.status = TemporalMatching.STATUS_WAITING
+        match1.save()
+        self.assertIsNotNone(match0.waiting_since)
+
+        match0.status = TemporalMatching.STATUS_CONFIRMED
+        match0.quantity = offer0.estimated_mass
+        match0.save()
+        print 'back to test'
+        match1 = TemporalMatching.objects.get(id=match1.id)
+        self.assertEqual(match1.status, TemporalMatching.STATUS_TOOLATE)
+
+    def test_quantity_correct_half(self):
+        from donor.models import process_new_offer
+        from beneficiary.models import process_new_beneficiary
+
+        post_save.disconnect(process_new_offer, sender=Offer)
+        post_save.disconnect(process_new_beneficiary, sender=Beneficiary)
+
+        # beneficiary for today
+        beneficiary0 = mommy.make(Beneficiary, user=self.user0, group=self.group0)
+
+        # new offer
+        offer0 = mommy.make(Offer,
+                            estimated_mass=7,
+                            donor=self.user1,
+                            food_category=self.category0,
+                            date=date.today())
+
+        match0 = mommy.make(TemporalMatching,
+                           offer=offer0,
+                           beneficiary=beneficiary0,
+                           date=date.today(),
+                           quantity=0,
+                           status=TemporalMatching.STATUS_WAITING)
+
+        match1 = mommy.make(TemporalMatching,
+                           offer=offer0,
+                           date=date.today(),
+                           quantity=0,
+                           status=TemporalMatching.STATUS_WAITING)
+
+        match2 = mommy.make(TemporalMatching,
+                           offer=offer0,
+                           date=date.today(),
+                           quantity=0,
+                           status=TemporalMatching.STATUS_WAITING)
+
+        match0.status = TemporalMatching.STATUS_CONFIRMED
+        match0.quantity = offer0.estimated_mass / 2
+        match0.save()
+        self.assertEqual(TemporalMatching.objects.get(id=match1.id).status,
+                         TemporalMatching.STATUS_WAITING)
+        self.assertEqual(TemporalMatching.objects.get(id=match2.id).status,
+                         TemporalMatching.STATUS_WAITING)
+
+        match1.status = TemporalMatching.STATUS_CONFIRMED
+        match1.quantity = offer0.estimated_mass / 2
+        match1.save()
+        self.assertEqual(TemporalMatching.objects.get(id=match2.id).status, TemporalMatching.STATUS_TOOLATE)
+
+
 class TestTemporalMatchCreation(TestCase):
     def setUp(self):
         post_save.disconnect(create_defaults, sender=User)

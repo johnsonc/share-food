@@ -2,7 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from datetime import datetime
-from django.db.models.signals import post_save
+from django.utils import timezone
+from django.db.models.signals import post_save, pre_save
+
+from django.conf import settings
+if "pinax.notifications" in settings.INSTALLED_APPS:
+    from pinax.notifications import models as notification
+else:
+    notification = None
 
 
 class Driver(models.Model):
@@ -37,6 +44,7 @@ class TemporalMatching(models.Model):
     STATUS_NOTIFIED = 6
     STATUS_EXPIRED = 7
     STATUS_CANCELED = 8
+    STATUS_TOOLATE = 9
 
     STATUS_OPTS = (
         (STATUS_PENDING, _("pending")),
@@ -46,7 +54,8 @@ class TemporalMatching(models.Model):
         (STATUS_ASSIGNED, _("assigned")),
         (STATUS_NOTIFIED, _("notified")),
         (STATUS_EXPIRED, _("expired")),
-        (STATUS_CANCELED, _("canceled"))
+        (STATUS_CANCELED, _("canceled")),
+        (STATUS_TOOLATE, _("too late"))
     )
     
     offer = models.ForeignKey('donor.Offer')
@@ -71,14 +80,55 @@ class TemporalMatching(models.Model):
             self.status = TemporalMatching.STATUS_ACCEPTED
 
 
-def update_confirmed_date(sender, instance, created, raw, using, update_fields, **kwargs):
-    if created or 'status' not in update_fields:
+def update_confirmed_date(sender, instance,  **kwargs):
+    if not instance.id:
         return
-    if instance.status == TemporalMatching.STATUS_WAITING:
-        instance.waiting_since = datetime.now()
-        instance.save()
+    old_instance = TemporalMatching.objects.get(id=instance.id)
+    if old_instance.status != instance.status and instance.status == TemporalMatching.STATUS_WAITING:
+        instance.waiting_since = timezone.now()
 
-post_save.connect(update_confirmed_date, sender=TemporalMatching)
+pre_save.connect(update_confirmed_date, sender=TemporalMatching)
+
+
+def check_quantity(sender, instance, **kwargs):
+    if not instance.id:
+        return
+
+    old_instance = TemporalMatching.objects.get(id=instance.id)
+
+    if old_instance.quantity == instance.quantity:
+        return
+
+    total_mass = instance.offer.estimated_mass
+
+    matches = TemporalMatching.objects.filter(offer=instance.offer,
+                                              date=instance.date,
+                                              status__in=[TemporalMatching.STATUS_CONFIRMED,
+                                                          TemporalMatching.STATUS_ACCEPTED,
+                                                          TemporalMatching.STATUS_ASSIGNED,
+                                                          TemporalMatching.STATUS_NOTIFIED])
+
+    matches_mass = sum([x.quantity for x in matches])
+    matches_mass += instance.quantity if instance.status == TemporalMatching.STATUS_CONFIRMED else 0
+
+    if matches_mass >= total_mass - 1:#-1 in case of odd total mass
+        to_notify = TemporalMatching.objects.filter(offer=instance.offer,
+                                                    date=instance.date,
+                                                    status__in=[TemporalMatching.STATUS_WAITING]).exclude(id=instance.id)
+        if notification:
+            waiting_users = [x.beneficiary.user for x in to_notify]
+            notification.send(waiting_users, "offer_toolate", {})
+
+        to_cancel = TemporalMatching.objects.filter(offer=instance.offer,
+                                                    date=instance.date,
+                                                    status__in=[TemporalMatching.STATUS_PENDING,
+                                                                TemporalMatching.STATUS_WAITING]).exclude(id=instance.id)
+        for tm in to_cancel:
+            tm.status = TemporalMatching.STATUS_TOOLATE
+            tm.save()
+
+
+pre_save.connect(check_quantity, sender=TemporalMatching)
 
 
 class VisitPoint(models.Model):

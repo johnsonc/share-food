@@ -1,16 +1,9 @@
 from django.shortcuts import render
 from django.contrib.admin.views.decorators import staff_member_required
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from django import forms
-
-@staff_member_required
-def matcher_panel(request):
-    return render_to_response('matcher/matcher_panel.html',
-        context_instance=RequestContext(request))
-
-
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404
@@ -18,6 +11,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from .models import VisitPoint, TemporalMatching
+
+
+@staff_member_required
+def matcher_panel(request):
+    return render_to_response('matcher/matcher_panel.html',
+                              context_instance=RequestContext(request))
 
 
 @login_required()
@@ -32,51 +31,56 @@ def driver_shedule(request, routing_id=None):
 
 
 class MatchConfirm(forms.Form):
+
     MATCH_REJECT = 0
     MATCH_100 = 1
     MATCH_50 = 2
+
     MATCH_TYPES = (
         (MATCH_100, _('Confirming the offer')),
         (MATCH_50, _('Confirming 50%')),
         (MATCH_REJECT, _('Rejecting the offer'))
     )
-    confirm = forms.IntegerField(widget=forms.Select(choices=MATCH_TYPES))
+
+    confirm = forms.IntegerField(widget=forms.RadioSelect(choices=MATCH_TYPES))
     hash = forms.IntegerField(widget=forms.HiddenInput())
     offer_id = forms.IntegerField(widget=forms.HiddenInput())
 
 
-def confirm_offer(request, offer_id, hash):
-    from django.shortcuts import get_object_or_404
+def confirm_offer(request, offer_id, secret):
+    match = get_object_or_404(TemporalMatching,
+                              id=offer_id,
+                              hash=secret,
+                              status=TemporalMatching.STATUS_WAITING)
 
     if request.method == 'POST':
         form = MatchConfirm(request.POST)
         if form.is_valid():
-            match = TemporalMatching.objects.get(id=offer_id)
 
-            if form.confirm == MatchConfirm.MATCH_REJECT:
+            if form.cleaned_data['confirm'] == MatchConfirm.MATCH_REJECT:
                 match.status = TemporalMatching.STATUS_CANCELED
-                from matcher.matcher import cancel_temporal_match
+                from .matcher import cancel_temporal_match
                 cancel_temporal_match(match)
 
-            if form.confirm == MatchConfirm.MATCH_100:
+            if form.cleaned_data['confirm'] == MatchConfirm.MATCH_100:
                 match.quantity = match.offer.estimated_mass
                 match.status = TemporalMatching.STATUS_CONFIRMED
 
-            if form.confirm == MatchConfirm.MATCH_50:
+            if form.cleaned_data['confirm'] == MatchConfirm.MATCH_50:
                 match.quantity = match.offer.estimated_mass / 2
                 match.status = TemporalMatching.STATUS_CONFIRMED
 
             match.save()
             return HttpResponseRedirect(reverse('admin:index'))
     else:
-        match = TemporalMatching.objects.get(id=offer_id)
-        form = MatchConfirm(initial={'offer_id': offer_id, 'hash': hash})
+
+        form = MatchConfirm(initial={'offer_id': offer_id, 'hash': secret})
 
     return render_to_response('admin/matcher/confirm_offer.html',
                               {'form': form,
                                'offer_id': offer_id,
                                'match': match,
-                               'hash': hash},
+                               'hash': secret},
                               context_instance=RequestContext(request))
 
 

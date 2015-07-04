@@ -10,6 +10,7 @@ if "pinax.notifications" in settings.INSTALLED_APPS:
         NoticeType.create("offer_send", _("New offer"), _("you have received a new offer"))
         NoticeType.create("offer_notified", _("We are shipping food for you"), _("we would like to confirm your offer request"))
         NoticeType.create("offer_canceled", _("Your transaction has been canceled"), _("we've canceled your transaction, contact our support for more details."))
+        NoticeType.create("offer_toolate", _("Your transaction has been canceled"), _("we've canceled your transaction, contact our support for more details."))
 
     signals.post_syncdb.connect(create_notice_types, sender=NoticeType)
 else:
