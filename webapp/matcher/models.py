@@ -24,7 +24,7 @@ class Driver(models.Model):
 
 
 class Routing(models.Model):
-    driver = models.ForeignKey(Driver)
+    driver = models.ForeignKey(User)
     date = models.DateField()
 
     class Meta:
@@ -43,6 +43,7 @@ class TemporalMatching(models.Model):
     STATUS_ASSIGNED = 5
     STATUS_NOTIFIED = 6
     STATUS_EXPIRED = 7
+    STATUS_CANCELED = 8
 
     STATUS_OPTS = (
         (STATUS_PENDING, _("pending")),
@@ -52,6 +53,7 @@ class TemporalMatching(models.Model):
         (STATUS_ASSIGNED, _("assigned")),
         (STATUS_NOTIFIED, _("notified")),
         (STATUS_EXPIRED, _("expired")),
+        (STATUS_CANCELED, _("canceled")),
     )
     
     offer = models.ForeignKey('donor.Offer')
@@ -60,13 +62,14 @@ class TemporalMatching(models.Model):
     beneficiary_contact_person = models.CharField(max_length=255)
     quantity = models.FloatField()
     status = models.PositiveSmallIntegerField(max_length=1, choices=STATUS_OPTS)
-    driver = models.ForeignKey(User, null=True, blank=True, default=None)
+    driver = models.ForeignKey(User, null=True, blank=True, default=None, related_name='match_driver')
     hash = models.IntegerField(blank=True, null=True)
     waiting_since = models.DateTimeField(blank=True, null=True)
+    canceled_by = models.ForeignKey(User, blank=True, null=True, related_name='canceler')
 
     class Meta:
-        verbose_name = _('Temporal match')
-        verbose_name_plural = _('Temporal matchings')
+        verbose_name = _('Match')
+        verbose_name_plural = _('Matches')
 
     def send_offer(self):
         self.status = TemporalMatching.STATUS_WAITING
@@ -128,22 +131,22 @@ pre_save.connect(check_quantity, sender=TemporalMatching)
 
 
 class VisitPoint(models.Model):
-    STATUS = (
-        ('p', _('Pending')),
-        ('c', _('Confirmed')),
+    STATUS_PENDING = 'p'
+    STATUS_CONFIRMED = 'c'
+    STATUS_CANCELED = 'x'
+
+    STATUS_OPTS = (
+        (STATUS_PENDING, _('Pending')),
+        (STATUS_CONFIRMED, _('Confirmed')),
+        (STATUS_CANCELED, _('Canceled')),
     )
 
     seq_num = models.PositiveSmallIntegerField()
-    matched = models.ForeignKey('Matched', to_field='id')
-    status = models.CharField(max_length=1, choices=STATUS, default='p')
+    matched = models.ForeignKey(TemporalMatching)
+    status = models.CharField(max_length=1, choices=STATUS_OPTS, default=STATUS_PENDING)
     donor = models.BooleanField(default=False)
-    routing = models.ForeignKey('Routing', related_name='visitpoints', null=True, blank=True)
-
-    class Meta:
-        verbose_name = _('Visit point')
-        verbose_name_plural = _('Visit points')
-        ordering = ['seq_num']
-
+    routing = models.ForeignKey(Routing, related_name='visitpoints', null=True, blank=True)
+    confirmed = models.DateTimeField(null=True, blank=True)
 
     def __unicode__(self):
         if self.donor:
@@ -151,35 +154,7 @@ class VisitPoint(models.Model):
         else:
             return self.matched.beneficiary.user.organization.address
 
-
-"""
-class Delivery(models.Model):
-    routing = models.ForeignKey(Routing)
-    visit_point = models.ForeignKey(VisitPoint)
-
     class Meta:
-        verbose_name = _('Delivery')
-        verbose_name_plural = _('Delivery points')
-
-    def __unicode__(self):
-        return 'deliver for %s' (self.routing)
-"""
-
-
-class Matched(models.Model):
-    offer = models.ForeignKey('donor.Offer')
-    beneficiary = models.ForeignKey('beneficiary.Beneficiary')
-    driver = models.ForeignKey(Driver)
-    date = models.DateField()
-    beneficiary_contact_person = models.CharField(max_length=255)
-    quantity = models.FloatField()
-
-    class Meta:
-        verbose_name = _('Delivery schedule (Match)')
-        verbose_name_plural = _('Delivery schedules (Matches)')
-        permissions = (
-            ('readonly', 'Can read matches'),
-        )
-
-    def __unicode__(self):
-        return '%s' % str(self.date)
+        verbose_name = _('Visit point')
+        verbose_name_plural = _('Visit points')
+        ordering = ['seq_num']

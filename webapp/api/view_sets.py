@@ -75,23 +75,26 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
 
         status = self.request.data.get('status', -1)
         beneficiary_id = self.request.data.get('beneficiary', -1)
-
+        driver_id = self.request.data.get('driver', -1)
         temp_matching_id = self.request.data.get('id', -1)
 
-        if status == 2:
+        if status == TemporalMatching.STATUS_WAITING:
             print "process waiting"
             self.send_email_to_beneficiary(beneficiary_id, temp_matching_id)
-        elif status == 3:
+        elif status == TemporalMatching.STATUS_CONFIRMED:
             print "process confirmed"
-        elif status == 4:
+        elif status == TemporalMatching.STATUS_ACCEPTED:
             print "process accepted"
-        elif status == 5:
+        elif status == TemporalMatching.STATUS_ASSIGNED:
             print "process assigned"
-            print self.request.data
-        elif status == 6:
+            self.assign_driver(temp_matching_id, driver_id)
+        elif status == TemporalMatching.STATUS_NOTIFIED:
             print "process notified"
             self.notify_all(temp_matching_id)
-    
+        elif status == TemporalMatching.STATUS_CANCELED:
+            print "process cancel"
+            self.cancel(temp_matching_id)
+
     def perform_update(self, serializer):
         self.statusChangeActions()
         serializer.save()
@@ -130,9 +133,19 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
                                  "transaction_notify",
                                  match)
 
+    def assign_driver(self, temporal_matching_id, driver_id):
+        if temporal_matching_id < 0 or driver_id < 0:
+            return
+        from matcher import matcher
+        matcher.assign_driver_to_match(User.objects.get(id=driver_id),
+                               TemporalMatching.objects.get(id=temporal_matching_id))
 
-
-
+    def cancel(self, temporal_matching_id):
+        print 'lets cance;'
+        if temporal_matching_id < 0:
+            return
+        from matcher import matcher
+        matcher.cancel_temporal_match(TemporalMatching.objects.get(id=temporal_matching_id))
 
 router.register(r'temporal_matching_simple', TempMatchSimpleViewSet)
 

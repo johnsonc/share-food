@@ -34,7 +34,7 @@
         {% endif %}
 
         {% if user.is_superuser or not user.profile.driver %}
-            <li role="presentation"><a href="{% url 'admin:matcher_matched_changelist' %}">{% trans 'Delivery schedule' %}</a></li>
+            <li role="presentation"><a href="{% url 'admin:matcher_temporalmatching_changelist' %}">{% trans 'Delivery schedule' %}</a></li>
         {% endif %}
 
 

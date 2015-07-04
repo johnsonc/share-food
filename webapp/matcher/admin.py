@@ -1,35 +1,61 @@
 from datetime import datetime, time
 from django.contrib import admin
-from panel.admin import site
+from django.contrib.auth.models import User
 from django.core import urlresolvers
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
+from django.contrib import messages
 from donor.models import Offer
-from .models import Driver, Routing, TemporalMatching, Matched, VisitPoint
+from .models import Driver, Routing, TemporalMatching, VisitPoint
 from django.db.models import Q
+from panel.admin import site
+
+
+def cancel_matching(modeladmin, request, queryset):
+    from .matcher import cancel_temporal_match
+    for match in queryset:
+        if request.user.profile.beneficiary and match.status == TemporalMatching.STATUS_NOTIFIED:
+            messages.error(request, "Beneficiaries can't cancel notifed transactions")
+            continue
+        if match.status == TemporalMatching.STATUS_CANCELED:
+            messages.error(request, "You can cancel transaction only one")
+            continue
+        if match.status == TemporalMatching.STATUS_EXPIRED:
+            messages.error(request, "The transaction is expired, you can't cancel it")
+            continue
+        cancel_temporal_match(match)
+cancel_matching.short_description = "Cancel selected transaction - we will notify all parties, there is no undo button!"
 
 
 class MatchAdmin(admin.ModelAdmin):
 
-    model = Matched
+    model = TemporalMatching
 
     change_form_template = 'admin/matcher/match_details.html'
 
-    list_display = ('date', 'offer', 'beneficiary', 'driver', 'quantity', 'beneficiary_contact_person')
+    list_display = ('date', 'status', 'offer', 'beneficiary', 'driver', 'quantity', 'beneficiary_contact_person')
 
-    readonly_fields = ('date', 'driver', 'quantity', 'beneficiary_contact_person')
+    readonly_fields = ('status', 'date', 'driver', 'quantity', 'beneficiary_contact_person')
 
-    exclude = ('offer', 'beneficiary',)
+    exclude = ['offer', 'beneficiary', 'waiting_since', 'hash']
 
-    actions = []
+    actions = [cancel_matching]
 
     def get_queryset(self, request):
         qs = super(MatchAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
 
-        return qs.filter(Q(offer__donor=request.user) |
-                         Q(beneficiary__user=request.user))
+        return qs.filter((Q(offer__donor=request.user) | Q(beneficiary__user=request.user)) &
+                         (Q(status=TemporalMatching.STATUS_ASSIGNED) |
+                          Q(status=TemporalMatching.STATUS_NOTIFIED) |
+                          Q(status=TemporalMatching.STATUS_CANCELED)))
+
+    #def get_actions(self, request):
+    #    actions = super(MatchAdmin, self).get_actions(request)
+    #    # TODO check user role
+    #    return actions
+
 
 
 class VisitPointsByDriver(admin.SimpleListFilter):
@@ -38,8 +64,8 @@ class VisitPointsByDriver(admin.SimpleListFilter):
     template = 'matcher/filter_driver.html'
 
     def lookups(self, request, model_admin):
-        drivers = Driver.objects.all().order_by('user__username')
-        return ((a.id, a.user.username) for a in drivers)
+        drivers = User.objects.filter(profile__driver=True).order_by('username')
+        return ((a.id, a.username) for a in drivers)
 
     def queryset(self, request, queryset):
         if self.value():
@@ -109,8 +135,8 @@ class VisitPointAdmin(admin.ModelAdmin):
 
     #change_list_template = 'matcher/change_list_visitpoint.html'
 
-    list_display = ('name', 'address', 'driver', 'status',
-                    'date', 'time', 'details_link', 'confirm', 'up', 'down')
+    list_display = ('name', 'address', 'donor', 'driver', 'status',
+                    'date', 'time', 'confirm', 'up', 'down')
 
     list_filter = (VisitPointsByDriver, VisitPointByDate, VisitPointByDateFrom, VisitPointByDateTo)
 
@@ -146,8 +172,8 @@ class VisitPointAdmin(admin.ModelAdmin):
 
     def time(self, instance):
         if instance.donor:
-            return '%s - %s ' % (datetime.strftime(instance.matched.offer.time_from, "%H:%M"),
-                                 datetime.strftime(instance.matched.offer.time_to, "%H:%M"))
+            return '%s - %s ' % (str(instance.matched.offer.time_from),
+                                 str(instance.matched.offer.time_to))
         else:
             timewindows = ''
             for tw in instance.matched.beneficiary.get_timewindows():
@@ -158,14 +184,17 @@ class VisitPointAdmin(admin.ModelAdmin):
             return timewindows
 
     def details_link(self, instance):
-        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('admin:matcher_matched_change',
+        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('admin:matcher_temporalmatching_change',
                                                                        args=(instance.matched.id,)),
                                                     '?'+self.param.urlencode() if self.param else '',
                                                                         _('Details')))
     def confirm(self, instance):
-        return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('confirm_visit_point', args=(instance.id,)),
+        if instance.status == VisitPoint.STATUS_PENDING:
+            return mark_safe('<a href="%s%s">%s</a>' % (urlresolvers.reverse('confirm_visit_point', args=(instance.id,)),
                                                     '?'+self.param.urlencode() if self.param else '',
                                                                         _('Confirm')))
+        else:
+            return '-'
 
     def up(self, instance):
 
@@ -218,12 +247,9 @@ class RoutingAdmin(admin.ModelAdmin):
         return mark_safe('<a href="%s">%s</a>' % (urlresolvers.reverse('admin:matcher_visitpoint_changelist'),
                                             _('Show route')))
 
-
+site.disable_action('delete_selected')
 site.register(Driver)
-site.register(TemporalMatching)
+site.register(TemporalMatching, MatchAdmin)
 site.register(VisitPoint, VisitPointAdmin)
-
-site.register(Matched, MatchAdmin)
-#site.register(Matched)
 site.register(Routing, RoutingAdmin)
 

@@ -3,6 +3,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
+from django.utils import timezone
 from django import forms
 from django.shortcuts import render, render_to_response
 from django.template import RequestContext
@@ -100,6 +101,7 @@ def confirm_offer(request, offer_id, secret):
 def confirm_visit_point(request, visit_point):
     vp = get_object_or_404(VisitPoint, pk=visit_point)
     vp.status = 'c'
+    vp.confirmed = timezone.now()
     vp.save()
     return HttpResponseRedirect('%s?%s' % (reverse('admin:matcher_visitpoint_changelist'),
                                            request.GET.urlencode()))

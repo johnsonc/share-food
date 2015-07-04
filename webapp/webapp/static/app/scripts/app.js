@@ -49,6 +49,8 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     mapping['4'] = "accepted";
     mapping['5'] = "assigned";
     mapping['6'] = "notified";
+    mapping['7'] = "expired";
+    mapping['8'] = "canceled";
     
     $scope.sendOfferChecked     = true;
     $scope.acceptChecked        = true;
@@ -239,7 +241,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
     
     $scope.cancel = function(items){
          angular.forEach(items, function(item){
-            $scope.changeStatus(item,1,null);
+            $scope.changeStatus(item,8,null);
          });
     }
     
@@ -278,6 +280,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                 if( item.status != 6 ){
                     $scope.cancelChecked = true;
                 }
+
             }
         });
     }
@@ -311,6 +314,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                 .then(function(resp){
                     item.status_maped = mapping[resp.status];
                     item.status = resp.status;
+
                     $scope.beneficiaryChanged($scope.items);
                 });
             }

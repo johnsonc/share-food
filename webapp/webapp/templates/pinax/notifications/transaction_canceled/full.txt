@@ -1,6 +1,7 @@
-{% load i18n %}{% url "notification_notices" as notices_url %}{% blocktrans %}You have received the following notice from {{ current_site }}:
+Dear Maple Leaf Harvest Beneficiary
 
-{{ message }}
+We’re sorry to inform you that due to unexpected circumstances we have to cancel your potential food donation today. We will be sending you further details about future potential food donations.
 
-To see other notices or change how you receive notifications, please go to {{ default_http_protocol }}://{{ current_site }}{{ notices_url }}
-{% endblocktrans %}
+Regards,
+
+Maple Leaf Harvest Team

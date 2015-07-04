@@ -1,14 +1,17 @@
 __author__ = 'darek'
 from django.db.models import Q
-from donor.models import Offer
-from beneficiary.models import Beneficiary
-from .models import TemporalMatching
+
 from datetime import datetime, timedelta, date
 from django.utils import timezone
 import logging
 import random
 from django.conf import settings
 from django.conf import settings
+
+from donor.models import Offer
+from beneficiary.models import Beneficiary
+from .models import TemporalMatching, Driver, Routing, VisitPoint
+
 logger = logging.getLogger(__name__)
 
 if "pinax.notifications" in settings.INSTALLED_APPS:
@@ -18,9 +21,42 @@ else:
 
 
 def cancel_temporal_match(temporalmatching):
-    # TODO implement this!
-    pass
+    print 'cancel from matcher'
+    to_notify = [temporalmatching.offer.donor, temporalmatching.beneficiary.user]
+    print to_notify
+    if temporalmatching.status in [TemporalMatching.STATUS_ASSIGNED, TemporalMatching.STATUS_NOTIFIED]:
+        # temporal matching has a driver and visit points
+        to_notify.append(temporalmatching.driver)
+        visitpoints = VisitPoint.objects.filter(matched=temporalmatching)
+        for vp in visitpoints:
+            vp.status = VisitPoint.STATUS_CANCELED
+            vp.save()
 
+    temporalmatching.status = TemporalMatching.STATUS_CANCELED
+    temporalmatching.save()
+    print 'status seted up'
+    if notification:
+        notification.send(to_notify, 'transaction_canceled', {})
+
+
+
+
+def assign_driver_to_match(driver, temporalmatching):
+    routing, created = Routing.objects.get_or_create(driver=driver, date=temporalmatching.date)
+    visitpoints = VisitPoint.objects.filter(routing=routing).order_by('-seq_num')
+    seq_num = 0 if len(visitpoints) == 0 else visitpoints[0].seq_num + 1
+    start = VisitPoint(seq_num=seq_num,
+                       matched=temporalmatching,
+                       status=VisitPoint.STATUS_PENDING,
+                       donor=True,
+                       routing=routing)
+    start.save()
+    stop = VisitPoint(seq_num=seq_num+1,
+                      matched=temporalmatching,
+                      status=VisitPoint.STATUS_PENDING,
+                      donor=False,
+                      routing=routing)
+    stop.save()
 
 def find_offers_for(date):
     logger.info("find_offers_for:%s" % str(date))
