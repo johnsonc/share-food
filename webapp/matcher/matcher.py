@@ -91,12 +91,28 @@ def find_existing_matches_for(for_date):
 def match(offer, beneficiary):
     #offer.beneficiary_group * -- beneficiary.group 1
     if beneficiary.group not in offer.beneficiary_group.all():
+        # a
         return False
-
     #offer.food_category 1 -- beneficiary.food_category *
     if offer.food_category not in beneficiary.food_category.all():
+        # a
         return False
 
+    if not (offer.rel_issue in beneficiary.accept_rel_issue.all() or len(beneficiary.accept_rel_issue.all()) == 0):
+        # c
+        return False
+
+    if not (offer.meat_issue in beneficiary.accept_meat_issue.all() or len(beneficiary.accept_meat_issue.all()) == 0):
+        # c
+        return False
+
+    not_contain_list = offer.not_contain.all()
+    if not_contain_list is None or len(not_contain_list) == 0:
+        return True
+    # else check:
+    for ingredient in beneficiary.dont_accept.all():
+        if ingredient not in not_contain_list:
+            return False
     return True
 
 

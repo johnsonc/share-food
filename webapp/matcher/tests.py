@@ -133,7 +133,7 @@ class TestBeneficiaryLookupByDate(TestCase):
         day0 = datetime.strptime('2015-06-01', '%Y-%m-%d')
 
         dtw0 = mommy.make(DeliveryTimeWindows, beneficiary=self.beneficiary,
-                                    day_of_week=0)
+                          day_of_week=0)
         # day0, day before, day after
         self.assertEqual(len(find_beneficiaries_for(day0)), 1)
         self.assertEqual(len(find_beneficiaries_for(day0+timedelta(days=-1))), 0)
@@ -146,7 +146,7 @@ class TestBeneficiaryLookupByDate(TestCase):
         self.assertEqual(len(find_beneficiaries_for(day0+timedelta(days=28))), 1)
 
         dtw1 = mommy.make(DeliveryTimeWindows, beneficiary=self.beneficiary,
-                                    day_of_week=1)
+                          day_of_week=1)
         self.assertEqual(len(find_beneficiaries_for(day0)), 1)# Monday 1th
         self.assertEqual(len(find_beneficiaries_for(day0+timedelta(days=1))), 1)# Tuesday
         self.assertEqual(len(find_beneficiaries_for(day0+timedelta(days=8))), 1)
@@ -221,15 +221,19 @@ class TestMatch(TestCase):
 
     def test_food_group_match(self):
         beneficiary0 = mommy.make(Beneficiary, user=self.user0,
-                                    group=self.group0)
+                                  group=self.group0)
         beneficiary0.food_category.add(self.category0)
+        beneficiary0.dont_accept.clear()
+        beneficiary0.accept_rel_issue.clear()
+        beneficiary0.accept_meat_issue.clear()
         beneficiary0.save()
         beneficiary1 = mommy.make(Beneficiary, user=self.user1,
-                                    group=self.group1)
+                                  group=self.group1)
         beneficiary1.food_category.add(self.category0)
         beneficiary1.save()
 
-        offer0 = mommy.make(Offer, donor=self.user2, food_category=self.category0)
+        offer0 = mommy.make(Offer, donor=self.user2,
+                            food_category=self.category0)
 
         self.assertFalse(match(offer0, beneficiary0))
         self.assertFalse(match(offer0, beneficiary1))
@@ -310,7 +314,7 @@ class TestQuantityMonitor(TestCase):
         match0.save()
         print 'back to test'
         match1 = TemporalMatching.objects.get(id=match1.id)
-        self.assertEqual(match1.status, TemporalMatching.STATUS_TOOLATE)
+        self.assertEqual(match1.status, TemporalMatching.STATUS_EXPIRED)
 
     def test_quantity_correct_half(self):
         from donor.models import process_new_offer
@@ -359,7 +363,7 @@ class TestQuantityMonitor(TestCase):
         match1.status = TemporalMatching.STATUS_CONFIRMED
         match1.quantity = offer0.estimated_mass / 2
         match1.save()
-        self.assertEqual(TemporalMatching.objects.get(id=match2.id).status, TemporalMatching.STATUS_TOOLATE)
+        self.assertEqual(TemporalMatching.objects.get(id=match2.id).status, TemporalMatching.STATUS_EXPIRED)
 
 
 class TestTemporalMatchCreation(TestCase):
@@ -382,6 +386,9 @@ class TestTemporalMatchCreation(TestCase):
         # beneficiary for today
         beneficiary0 = mommy.make(Beneficiary, user=self.user0, group=self.group0)
         beneficiary0.food_category.add(self.category0)
+        beneficiary0.accept_meat_issue.clear()
+        beneficiary0.accept_rel_issue.clear()
+        beneficiary0.dont_accept.clear()
         beneficiary0.save()
         mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday())
 
@@ -397,13 +404,13 @@ class TestTemporalMatchCreation(TestCase):
 
         matches = TemporalMatching.objects.all()
         self.assertEqual(len(matches), 1)
-        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday()+1)
+        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=((date.today().weekday()+1) % 7))
 
         match_offers_to_beneficiaries(offer0, date.today())
         matches = TemporalMatching.objects.all()
         self.assertEqual(len(matches), 1)
 
-        match_offers_to_beneficiaries(offer0, date.today(), 1)
+        match_offers_to_beneficiaries(offer0, date.today(), 2)
         matches = TemporalMatching.objects.all()
         self.assertEqual(len(matches), 2)
         """
@@ -452,7 +459,7 @@ class TestTemporalMatchCreation(TestCase):
         beneficiary1 = mommy.make(Beneficiary, user=self.user1, group=self.group0)
         beneficiary1.food_category.add(self.category0)
         beneficiary1.save()
-        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary1, day_of_week=date.today().weekday()+1)
+        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary1, day_of_week=((date.today().weekday()+1) % 7))
 
         match_beneficiaries_to_offers(beneficiary0, date.today())
 
@@ -469,7 +476,6 @@ class TestTemporalMatchCreation(TestCase):
         matches = TemporalMatching.objects.all()
         self.assertEqual(len(matches), 1)
         """
-        print 360
         match_beneficiaries_to_offers(beneficiary1, date.today()+timedelta(days=1))
         matches = TemporalMatching.objects.all()
         self.assertEqual(len(matches), 2)
@@ -478,7 +484,8 @@ class TestTemporalMatchCreation(TestCase):
         post_save.connect(process_new_beneficiary, sender=Beneficiary)
 
 
-class TestCheckTemporalMatches(TestCase):
+class TestMeatEtc(TestCase):
+
     def setUp(self):
         post_save.disconnect(create_defaults, sender=User)
         self.user0 = mommy.make(User)
@@ -487,46 +494,111 @@ class TestCheckTemporalMatches(TestCase):
         self.category0 = mommy.make(FoodCategory)
         self.group0 = mommy.make(BeneficiaryGroup)
 
-    def test_searching(self):
+    def test_rel_meat(self):
         from donor.models import process_new_offer
         from beneficiary.models import process_new_beneficiary
-        from .matcher import check_temporal_matches, find_temporal_matches_to_check
-        from random import randint
+        from .matcher import match_offers_to_beneficiaries
 
-        # ???
         post_save.disconnect(process_new_offer, sender=Offer)
         post_save.disconnect(process_new_beneficiary, sender=Beneficiary)
 
         # beneficiary for today
-        beneficiary0 = mommy.make(Beneficiary, user=self.user0, group=self.group0)
+        beneficiary0 = mommy.make(Beneficiary,
+                                  user=self.user0,
+                                  group=self.group0)
         beneficiary0.food_category.add(self.category0)
+        beneficiary0.accept_rel_issue.clear()
+        beneficiary0.accept_meat_issue.clear()
+        beneficiary0.dont_accept.clear()
         beneficiary0.save()
-        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday())
 
-        # new offerts
-        offerts = []
-        for n in range(10):
-            tmp_offer = mommy.make(Offer, donor=self.user1, food_category=self.category0, date=date.today()+timedelta(days = randint(0, 10)))
-            tmp_offer.beneficiary_group.add(self.group0)
-            tmp_offer.save()
-            offerts.append(tmp_offer)
+        # new offer
+        offer0 = mommy.make(Offer, donor=self.user1,
+                            food_category=self.category0,
+                            date=date.today())
+        offer0.beneficiary_group.add(self.group0)
+        offer0.save()
+        offer1 = mommy.make(Offer, donor=self.user1,
+                            food_category=self.category0,
+                            date=date.today()+timedelta(days=1))
+        offer1.beneficiary_group.add(self.group0)
+        offer1.save()
 
-        mommy.make(DeliveryTimeWindows, beneficiary=beneficiary0, day_of_week=date.today().weekday()+1)
+        self.assertTrue(offer0, beneficiary0)
+        ri = mommy.make(ReligiousIssues, name="testing")
+        beneficiary0.accept_rel_issue.add(ri)
 
-        mins = 0
-        for offert in offerts:
-            tmp_matching = mommy.make(TemporalMatching, offer=offert, beneficiary=beneficiary0, date=date.today(), status=3)
-            tmp_matching.waiting_since = datetime.now()-timedelta(minutes=mins)
-            tmp_matching.save()
-            mins+=20
+        self.assertFalse(match(offer0, beneficiary0))
 
-        self.assertEqual(len(find_temporal_matches_to_check()),10)
+        beneficiary0.accept_rel_issue.clear()
+        offer0.rel_issue = ri
 
-        check_temporal_matches()
+        self.assertTrue(offer0, beneficiary0)
 
-        self.assertEqual(len(find_temporal_matches_to_check()),3)
+        beneficiary0.accept_rel_issue.add(ri)
 
-        #co to jest?
-        post_save.connect(process_new_offer, sender=Offer)
-        post_save.connect(process_new_beneficiary, sender=Beneficiary)
+        self.assertTrue(offer0, beneficiary0)
 
+        beneficiary0.accept_rel_issue.clear()
+        offer0.rel_issue = None
+
+        ri = mommy.make(MeatIssues, name="testing")
+        beneficiary0.accept_meat_issue.add(ri)
+
+        self.assertFalse(match(offer0, beneficiary0))
+
+        beneficiary0.accept_meat_issue.clear()
+        offer0.meat_issue = ri
+
+        self.assertTrue(match(offer0, beneficiary0))
+
+        beneficiary0.accept_meat_issue.add(ri)
+
+        self.assertTrue(match(offer0, beneficiary0))
+
+        beneficiary0.accept_meat_issue.clear()
+        offer0.meat_issue = None
+
+    def test_ingredient(self):
+        from donor.models import process_new_offer
+        from beneficiary.models import process_new_beneficiary
+        from .matcher import match_offers_to_beneficiaries
+
+        post_save.disconnect(process_new_offer, sender=Offer)
+        post_save.disconnect(process_new_beneficiary, sender=Beneficiary)
+
+        # beneficiary for today
+        beneficiary0 = mommy.make(Beneficiary,
+                                  user=self.user0,
+                                  group=self.group0)
+        beneficiary0.food_category.add(self.category0)
+        beneficiary0.accept_rel_issue.clear()
+        beneficiary0.accept_meat_issue.clear()
+        beneficiary0.dont_accept.clear()
+        beneficiary0.save()
+
+        # new offer
+        offer0 = mommy.make(Offer, donor=self.user1,
+                            food_category=self.category0,
+                            date=date.today())
+        offer0.beneficiary_group.add(self.group0)
+        offer0.save()
+        offer1 = mommy.make(Offer, donor=self.user1,
+                            food_category=self.category0,
+                            date=date.today()+timedelta(days=1))
+        offer1.beneficiary_group.add(self.group0)
+        offer1.save()
+
+        self.assertTrue(match(offer0, beneficiary0))
+
+        ing1 = mommy.make(FoodIngredients)
+        beneficiary0.dont_accept.clear()
+        offer0.not_contain.add(ing1)
+
+        self.assertTrue(match(offer0, beneficiary0))
+
+        beneficiary0.dont_accept.add(ing1)
+        self.assertTrue(match(offer0, beneficiary0))
+        offer0.not_contain.clear()
+
+        self.assertTrue(match(offer0, beneficiary0))

@@ -26,10 +26,12 @@ class Beneficiary(models.Model):
     dont_accept = models.ManyToManyField(FoodIngredients, related_name='ingredients_rejected_by_beneficiaries',
                                          verbose_name=_("We don't accept food CONTAINING:"))
     accept_meat_issue = models.ManyToManyField(MeatIssues, related_name='meat_issues_by_beneficiaries',
-                                         verbose_name=_("We accept:"))
+                                               verbose_name=_("We accept:"),
+                                               blank=True, null=True)
 
     accept_rel_issue = models.ManyToManyField(ReligiousIssues, related_name='rel_issues_by_beneficiaries',
-                                         verbose_name=_("We accept:"))
+                                              verbose_name=_("We accept:"),
+                                              blank=True, null=True)
     preference_info = models.TextField(_('Additional info:'))
     last_delivery = models.DateField(blank=True, null=True)
 

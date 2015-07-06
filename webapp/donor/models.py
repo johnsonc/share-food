@@ -28,8 +28,8 @@ class Offer(models.Model):
 
     beneficiary_group = models.ManyToManyField(BeneficiaryGroup, verbose_name=_('Beneficiary group'))
 
-    meat_issue = models.ForeignKey(MeatIssues)
-    rel_issue = models.ForeignKey(ReligiousIssues)
+    meat_issue = models.ForeignKey(MeatIssues, blank=True, null=True)
+    rel_issue = models.ForeignKey(ReligiousIssues, blank=True, null=True)
 
     packaging = models.ForeignKey(PackagingCategory)
     temperature = models.ForeignKey(TemperatureCategory)
