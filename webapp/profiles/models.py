@@ -95,6 +95,12 @@ def create_defaults(sender, instance, created, raw, using, update_fields, **kwar
                           operator=False)
         instance.profile.save()
 
+    from pinax.notifications.models import NoticeSetting, NoticeType
+    notice_types = NoticeType.objects.all()
+    for t in notice_types:
+        ns = NoticeSetting(user=instance, notice_type=t, medium=0, send=True)
+        ns.save()
+
     if profile.donor:
         instance.groups = [Group.objects.get(name='Donor')]
 
