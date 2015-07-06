@@ -23,10 +23,10 @@ else:
 def cancel_temporal_match(temporalmatching):
     print 'cancel from matcher'
     to_notify = [temporalmatching.offer.donor, temporalmatching.beneficiary.user]
-    print to_notify
     if temporalmatching.status in [TemporalMatching.STATUS_ASSIGNED, TemporalMatching.STATUS_NOTIFIED]:
         # temporal matching has a driver and visit points
-        to_notify.append(temporalmatching.driver)
+        if temporalmatching.driver:
+            to_notify.append(temporalmatching.driver)
         visitpoints = VisitPoint.objects.filter(matched=temporalmatching)
         for vp in visitpoints:
             vp.status = VisitPoint.STATUS_CANCELED
@@ -34,7 +34,6 @@ def cancel_temporal_match(temporalmatching):
 
     temporalmatching.status = TemporalMatching.STATUS_CANCELED
     temporalmatching.save()
-    print 'status seted up'
     if notification:
         notification.send(to_notify, 'transaction_canceled', {})
 
