@@ -40,7 +40,7 @@ def cancel_temporal_match(temporalmatching):
 
 
 def assign_driver_to_match(driver, temporal_matching):
-    routing, created = Routing.objects.get_or_create(driver=driver, date=temporalmatching.date)
+    routing, created = Routing.objects.get_or_create(driver=driver, date=temporal_matching.date)
     visit_points = VisitPoint.objects.filter(routing=routing).order_by('-seq_num')
     seq_num = 0 if len(visit_points) == 0 else visit_points[0].seq_num + 1
     start = VisitPoint(seq_num=seq_num,
@@ -98,21 +98,23 @@ def match(offer, beneficiary):
         # a
         return False
 
-    if not (offer.rel_issue in beneficiary.accept_rel_issue.all() or len(beneficiary.accept_rel_issue.all()) == 0):
+    if not (not offer.rel_issue or offer.rel_issue in beneficiary.accept_rel_issue.all() or len(beneficiary.accept_rel_issue.all()) == 0):
         # c
         return False
 
-    if not (offer.meat_issue in beneficiary.accept_meat_issue.all() or len(beneficiary.accept_meat_issue.all()) == 0):
+    if not (not offer.meat_issue or offer.meat_issue in beneficiary.accept_meat_issue.all() or len(beneficiary.accept_meat_issue.all()) == 0):
         # c
         return False
 
     not_contain_list = offer.not_contain.all()
     if not_contain_list is None or len(not_contain_list) == 0:
         return True
+
     # else check:
     for ingredient in beneficiary.dont_accept.all():
         if ingredient not in not_contain_list:
             return False
+
     return True
 
 
