@@ -72,12 +72,11 @@
                     </div>
                 </div>
 -->
-            
+                <div style="display:none;"  ng-model="select"></div>
                 <fieldset class="module aligned all_page">
                     <h2>{% trans "Donors:"%}</h2>            
                     <div class="form-row field-meat_issue field-rel_issue">
                         <div class="field-box field-meat_issue">
-                            <label class="required" for=""></label>
                             <div class="related-widget-wrapper">
                                 <table class="table table-hover">
                                   <thead>
@@ -91,6 +90,7 @@
 
                                       <tr ng-repeat="item in items | uniqueOffer:'id'" ng-click="viewDonorInInfoBox(item.offer);"  
                                          ng-class="{ bg_col:item.offer.showcolor}">
+                                          <input type="hidden" ng-if="$first" ng-init="select.offer={id:item.offer.id};item.offer.showcolor=true">
                                           <th>[[item.offer.id]]</th>
                                           <th>[[item.offer.name]]</th>
                                           <th>[[percentage(item.offer) | number:2]]%</th>
@@ -106,7 +106,7 @@
                     <div class="box_m">
                         <label class="required inline" for="">{% trans "Select:"%}</label>
                         <div>
-                            <div class="box radio_select" ng-model="select">
+                            <div class="box radio_select">
                                 <label class="radio-inline">
                                   <input type="radio" name="Options" id="inlineRadio1" ng-model="select.status" value=""> {% trans "all"%}
                                 </label>
@@ -128,6 +128,12 @@
                                 <label class="radio-inline">
                                   <input type="radio" name="Options" id="inlineRadio6" ng-model="select.status" value="6"> {% trans "notified"%}
                                 </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio7" ng-model="select.status" value="7"> {% trans "expired"%}
+                                </label>
+                                <label class="radio-inline">
+                                  <input type="radio" name="Options" id="inlineRadio8" ng-model="select.status" value="8"> {% trans "canceled"%}
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -136,7 +142,7 @@
                         <label class="required inline" for="">{% trans "Beneficiary:"%}</label>
                         <div>
                             <div class="box">
-                                <table class="table table-hover" ng-model="sum">
+                                <table  ng-model="sum">
                                   <thead>
                                       <tr>
                                           <th>#</th>
