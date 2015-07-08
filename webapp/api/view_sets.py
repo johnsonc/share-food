@@ -77,7 +77,7 @@ class TempMatchSimpleViewSet(viewsets.ModelViewSet):
         beneficiary_id = self.request.data.get('beneficiary', -1)
         driver_id = self.request.data.get('driver', -1)
         temp_matching_id = self.request.data.get('id', -1)
-        23412343 fdf
+        
         if status == TemporalMatching.STATUS_WAITING:
             print "process waiting"
             self.send_email_to_beneficiary(beneficiary_id, temp_matching_id)
