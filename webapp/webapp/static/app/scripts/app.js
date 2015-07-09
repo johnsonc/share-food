@@ -197,7 +197,7 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                     markers: map_points,
                     paths: lines
                 });
-            })
+            });
         }
     }
     
@@ -314,8 +314,12 @@ angular.module('angapp', ['restangular', 'leaflet-directive', 'ngCookies'])
                 .then(function(resp){
                     item.status_maped = mapping[resp.status];
                     item.status = resp.status;
+//                    item.driver = resp.driver;
 
                     $scope.beneficiaryChanged($scope.items);
+                },
+                function(response) {
+                    console.log("Error with status code", response.status);
                 });
             }
     }
